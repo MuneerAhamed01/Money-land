@@ -30,7 +30,7 @@ class DetailsPage extends StatelessWidget {
           ),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(14),
           child: Container(
             decoration: roundedConrner(lightColor),
             height: double.infinity,
