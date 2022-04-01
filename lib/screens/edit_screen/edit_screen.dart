@@ -3,19 +3,21 @@ import 'package:intl/intl.dart';
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
+import 'package:money_land/screens/edit_screen/assest/widgets.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
-import 'assest/functions.dart';
+import '../add_page/assest/functions.dart';
 
-class AddPage extends StatefulWidget {
-  const AddPage({Key? key}) : super(key: key);
+class EditScreen extends StatefulWidget {
+  const EditScreen({Key? key}) : super(key: key);
 
   @override
-  State<AddPage> createState() => _AddPageState();
+  State<EditScreen> createState() => _EditScreenState();
 }
 
-class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
+class _EditScreenState extends State<EditScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabControl;
 
   @override
@@ -30,10 +32,6 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     setState(() {});
   }
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
   List<String> items = ['Loan', 'Vehicle', 'House'];
   String? selected = 'Loan';
 
@@ -65,11 +63,12 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              textFields(_nameController, 'Name', 1),
+                              textFieldsEdit('Name', 1, "Engine work"),
                               sizedBox(context),
                               TextFormField(
+                                initialValue: "Fri 1 Apr",
                                 readOnly: true,
-                                controller: _dateController,
+
                                 // focusNode: AlwaysDisabledFocusNode(),
                                 decoration: dec("Date"),
                                 onTap: () {
@@ -89,9 +88,10 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                 ),
                               ),
                               sizedBox(context),
-                              textFields(_amountController, 'Amount', 1),
+                              textFieldsEdit('Amount', 1, '500'),
                               sizedBox(context),
-                              textFields(_notesController, 'Notes', 6),
+                              textFieldsEdit(
+                                  'Notes', 6, "Engine repair of bike"),
                               sizedBox(context),
                               _tabControl.index == 0
                                   ? SizedBox(
@@ -99,7 +99,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                       height: mediaQuery(context, 0.06),
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          print("Income");
+                                          Navigator.pop(context);
                                         },
                                         child: Text("Save", style: styleText),
                                         style: styleButton(context),
@@ -110,7 +110,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                       height: mediaQuery(context, 0.06),
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          print("Expense");
+                                          Navigator.pop(context);
                                         },
                                         child: Text(
                                           'Save',
@@ -134,7 +134,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     var formattedDate =
         await datePicker(context, 'dd-MM-yyyy', DatePickerMode.day);
     setState(() {
-      _dateController.text = formattedDate;
+      // _dateEditController.text = formattedDate;
     });
   }
 

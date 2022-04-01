@@ -14,7 +14,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(),
+      theme: ThemeData(
+          canvasColor: Colors.transparent,
+          scaffoldBackgroundColor: Colors.white),
       // home: const Splashscreen(),
       onGenerateRoute: RouteGenerator.generateRoute,
     );

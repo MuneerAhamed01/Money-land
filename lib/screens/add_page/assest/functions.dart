@@ -9,14 +9,17 @@ DateTime? date;
 
 //Date choosing start
 
-Future<String> datePicker(BuildContext context) async {
+Future<String> datePicker(
+    BuildContext context, String dateof, DatePickerMode mode) async {
   date = await showDatePicker(
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      initialDatePickerMode: mode,
       context: context,
       initialDate: now,
       firstDate: DateTime(2000),
       lastDate: DateTime(2030));
   if (date != null) {
-    String formattedDate = DateFormat('dd-MM-yyyy').format(date!);
+    String formattedDate = DateFormat(dateof).format(date!);
 
     return formattedDate;
   } else {
@@ -28,10 +31,10 @@ Future<String> datePicker(BuildContext context) async {
 
 //for hide keyboard
 
-class AlwaysDisabledFocusNode extends FocusNode {
-  @override
-  bool get hasFocus => false;
-}
+// class AlwaysDisabledFocusNode extends FocusNode {
+//   @override
+//   bool get hasFocus => false;
+// }
 
 List<DropdownMenuItem<String>>? category(String? selected, List<String> items) {
   return items

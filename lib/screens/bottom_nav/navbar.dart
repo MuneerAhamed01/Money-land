@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/add_page/add_page.dart';
+import 'package:money_land/screens/bottom_nav/assest/widget.dart';
 import 'package:money_land/screens/category_page/category.dart';
 import 'package:money_land/screens/homepage/home.dart';
 import 'package:money_land/screens/settings_page/settings.dart';
 import 'package:money_land/screens/statistic_page/statistic.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
+
+import '../statistic_page/swap_page/swap_page.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
@@ -18,7 +21,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   List screens = [
     const HomePage(),
-    const Statistic(),
+    const SwapInStatics(),
     const AddPage(),
     const Category(),
     const Settings()
@@ -28,12 +31,14 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: screens[currentIndex],
-      bottomNavigationBar: Container(
-        height: mediaQuery(context, 0.08),
+      bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        // height: mediaQuery(context, 0.08),
+        // decoration: roundedConrnerNav(),
         child: BottomNavigationBar(
+          backgroundColor: lightColor,
           type: BottomNavigationBarType.fixed,
           showUnselectedLabels: false,
-          backgroundColor: lightColor,
           selectedItemColor: const Color.fromRGBO(255, 103, 103, 100),
           unselectedItemColor: Colors.grey,
           iconSize: 26,

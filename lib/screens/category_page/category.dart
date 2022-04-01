@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_land/global/styles.dart';
+import 'package:money_land/screens/category_page/assest/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
@@ -40,6 +41,7 @@ class _CategoryState extends State<Category>
           shadowColor: Colors.transparent,
           backgroundColor: lightColor,
           bottom: TabBar(
+            indicatorWeight: 1,
             controller: _tabcontroller,
             tabs: const [
               Tab(
@@ -59,9 +61,9 @@ class _CategoryState extends State<Category>
         ),
         floatingActionButton: _tabcontroller.index == 0
             ? FloatingActionButton(
-                backgroundColor: lightColor,
+                backgroundColor: themeColor,
                 onPressed: () {
-                  print("hai");
+                  bottomSheet(context, "ADD Income");
                 },
                 child: const Icon(
                   Icons.add,
@@ -69,9 +71,9 @@ class _CategoryState extends State<Category>
                 ),
               )
             : FloatingActionButton(
-                backgroundColor: lightColor,
+                backgroundColor: themeColor,
                 onPressed: () {
-                  print("object");
+                  bottomSheet(context, "ADD Expense");
                 },
                 child: const Icon(
                   Icons.add,

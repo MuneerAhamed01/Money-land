@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_land/screens/bottom_nav/navbar.dart';
 import 'package:money_land/screens/details_screeen/details.dart';
+import 'package:money_land/screens/edit_screen/edit_screen.dart';
 
 import 'package:money_land/screens/onboarding_screen/onboarding_one.dart';
 import 'package:money_land/screens/onboarding_screen/onboarding_two.dart';
@@ -22,6 +23,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (context) => const NavBar());
       case '/details':
         return MaterialPageRoute(builder: (context) => const DetailsPage());
+      case '/editscreen':
+        return MaterialPageRoute(builder: (context) => const EditScreen());
       default:
         return MaterialPageRoute(builder: (context) => const Splashscreen());
     }

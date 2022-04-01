@@ -1,4 +1,4 @@
 import 'package:flutter/material.dart';
 
-Color themeColor = Color.fromRGBO(255, 103, 103, 100);
-Color lightColor = Color.fromARGB(255, 250, 224, 224);
+Color themeColor = Color.fromRGBO(244, 158, 158, 1);
+Color lightColor = Color.fromRGBO(255, 229, 229, 1);

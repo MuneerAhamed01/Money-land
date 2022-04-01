@@ -116,7 +116,7 @@ class HomePage extends StatelessWidget {
                         style: boldText(17),
                       ),
                     ),
-                    title: Text("Vehicle"),
+                    title: Text("Engine Work"),
                     subtitle: Text(formattedDate),
                     trailing: Text(
                       "₹ 500",

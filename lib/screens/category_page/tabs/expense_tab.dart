@@ -10,6 +10,7 @@ class Expense extends StatelessWidget {
   Widget build(BuildContext context) {
     List expense = ["Loan", "Vehicle", "House"];
     return Container(
+      color: Colors.white,
       child: ListView.separated(
         separatorBuilder: (context, index) {
           return Divider();
