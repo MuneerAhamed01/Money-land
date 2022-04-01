@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:money_land/global/styles.dart';
 
@@ -25,8 +26,8 @@ class OnBoardingOne extends StatelessWidget {
             alignment: AlignmentDirectional.bottomEnd,
             clipBehavior: Clip.none,
             children: [
-              Image.asset(
-                  "lib/screens/onboarding_screen/assest/images/imageoboard.png"),
+              SvgPicture.asset(
+                  "lib/screens/onboarding_screen/assest/images/imageofboard.svg"),
               Positioned(
                 right: -45,
                 child: SizedBox(

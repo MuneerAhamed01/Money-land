@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:money_land/screens/splash_screen/splash_screen.dart';
-import 'package:money_land/themes/colors/colors.dart';
+
 import 'package:money_land/themes/routes/routes.dart';
 
 void main() {
@@ -17,7 +16,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           canvasColor: Colors.transparent,
           scaffoldBackgroundColor: Colors.white),
-      // home: const Splashscreen(),
       onGenerateRoute: RouteGenerator.generateRoute,
     );
   }

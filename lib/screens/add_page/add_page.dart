@@ -80,6 +80,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                               SizedBox(
                                 width: double.infinity,
                                 child: DropdownButtonFormField<String>(
+                                  dropdownColor: Colors.white,
                                   decoration: dec(""),
                                   value: selected,
                                   items: category(selected, items),

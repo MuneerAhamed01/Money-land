@@ -76,9 +76,11 @@ class _EditScreenState extends State<EditScreen>
                                 },
                               ),
                               sizedBox(context),
-                              SizedBox(
+                              Container(
+                                color: Colors.white,
                                 width: double.infinity,
                                 child: DropdownButtonFormField<String>(
+                                  dropdownColor: Colors.white,
                                   decoration: dec(""),
                                   value: selected,
                                   items: category(selected, items),

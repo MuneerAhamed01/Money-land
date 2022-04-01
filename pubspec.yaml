@@ -55,6 +55,7 @@ flutter:
     - lib/screens/onboarding_screen/assest/images/imageoboard.png
     - lib/screens/onboarding_screen/assest/images/undraw_personal_goals_re_iow7
       1.svg
+    - lib/screens/onboarding_screen/assest/images/imageofboard.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see
