@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:money_land/global/styles.dart';
-import 'package:money_land/screens/onboarding_screen/onboarding_one.dart';
-import 'package:money_land/themes/routes/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+late SharedPreferences sharedPreferences;
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({Key? key}) : super(key: key);
@@ -45,6 +46,13 @@ class _SplashscreenState extends State<Splashscreen> {
 
   moveSplash(BuildContext context) async {
     await Future.delayed(const Duration(seconds: 3));
-    Navigator.pushReplacementNamed(context, '/onboardingone');
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    final value = sharedPreferences.getBool("move");
+    if (value == true) {
+      Navigator.pushReplacementNamed(context, "/home");
+    } else {
+      Navigator.pushReplacementNamed(context, '/onboardingone');
+    }
   }
 }

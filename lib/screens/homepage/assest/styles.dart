@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:money_land/themes/colors/colors.dart';
 
 BoxDecoration roundedConrner(Color color) {
   return BoxDecoration(
-    borderRadius: BorderRadius.circular(15),
+    // border: Border.all(color: themeColor),
+    borderRadius: BorderRadius.circular(5),
     color: color,
   );
 }

@@ -104,7 +104,7 @@ class _StatisticState extends State<Statistic>
                         ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.only(left: 13, right: 10),
                         child: Row(
                           // mainAxisAlignment: MainAxisAlignment.start,
                           children: [

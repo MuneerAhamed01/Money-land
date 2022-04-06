@@ -27,7 +27,7 @@ Widget transactionContainer(
         width: mediaQueryWidth(context, 0.29),
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
+              topLeft: Radius.circular(10), bottomRight: Radius.circular(5)),
           color: lightColor,
         ),
         child: Text(
@@ -36,5 +36,37 @@ Widget transactionContainer(
         ),
       )
     ],
+  );
+}
+
+Icon iconOf(IconData data) {
+  return Icon(
+    data,
+    size: 18,
+    color: Colors.black,
+  );
+}
+
+Widget datePickerOfHome(String type, BuildContext context) {
+  return Container(
+    alignment: Alignment.center,
+    height: mediaQuery(context, 0.03),
+    width: mediaQueryWidth(context, 0.20),
+    decoration: roundedConrnerHome(lightColor),
+    child: Text(
+      type,
+      style: TextStyle(
+        color: Colors.black,
+      ),
+      textAlign: TextAlign.center,
+    ),
+  );
+}
+
+BoxDecoration roundedConrnerHome(Color color) {
+  return BoxDecoration(
+    border: Border.all(color: themeColor),
+    borderRadius: BorderRadius.circular(5),
+    color: color,
   );
 }

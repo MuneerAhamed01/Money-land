@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/global/styles.dart';
+import 'package:money_land/screens/add_page/assest/widgets.dart';
+import 'package:money_land/screens/homepage/assest/functions.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/homepage/assest/widgets.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController _date_in_home;
+  @override
+  void initState() {
+    _date_in_home = TabController(length: 4, vsync: this);
+    _date_in_home.addListener(settings);
+    super.initState();
+  }
+
+  settings() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +43,71 @@ class HomePage extends StatelessWidget {
           style: titleText(),
         ),
         backgroundColor: lightColor,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 5),
+            child: IconButton(
+              icon: Icon(
+                Icons.calendar_month_outlined,
+                color: themeColor,
+              ),
+              onPressed: () => showDate(context, _date_in_home),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              child: _date_in_home.index <= 2
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Wrap(
+                          spacing: 0.01,
+                          children: [
+                            IconButton(
+                                onPressed: null,
+                                icon: iconOf(Icons.arrow_back_ios)),
+                            // ignore: avoid_unnecessary_containers
+                            Container(
+                              alignment: Alignment.center,
+                              child: TextButton(
+                                  onPressed: null,
+                                  child: Text(
+                                    _date_in_home.index == 0
+                                        ? formattedDate
+                                        : _date_in_home.index == 1
+                                            ? 'April'
+                                            : '2022',
+                                    style: TextStyle(color: Colors.black),
+                                  )),
+                            ),
+                            IconButton(
+                                onPressed: null,
+                                icon: iconOf(Icons.arrow_forward_ios))
+                          ],
+                        ),
+                      ],
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 20, top: 12),
+                      child: Row(
+                        children: [
+                          datePickerOfHome(formattedDate, context),
+                          SizedBox(
+                            width: mediaQueryWidth(context, 0.02),
+                          ),
+                          datePickerOfHome(formattedDate, context)
+                        ],
+                      ),
+                    ),
+              width: double.infinity,
+              height: mediaQuery(context, 0.04),
+              color: lightColor,
+            ),
             Stack(
               clipBehavior: Clip.none,
               alignment: Alignment.topCenter,
@@ -37,7 +117,7 @@ class HomePage extends StatelessWidget {
                     decoration: roundedConrner(lightColor)),
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+                      const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                   child: Stack(
                     children: [
                       Container(

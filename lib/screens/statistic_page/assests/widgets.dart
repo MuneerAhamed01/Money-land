@@ -21,8 +21,8 @@ Widget datePickerOf(String type, BuildContext context) {
   return Container(
     alignment: Alignment.center,
     height: mediaQuery(context, 0.03),
-    width: mediaQueryWidth(context, 0.1),
-    decoration: roundedConrner(themeColor),
+    width: mediaQueryWidth(context, 0.12),
+    decoration: roundedConrnerStaristic(lightColor),
     child: Text(
       type,
       style: TextStyle(
@@ -30,5 +30,13 @@ Widget datePickerOf(String type, BuildContext context) {
       ),
       textAlign: TextAlign.center,
     ),
+  );
+}
+
+BoxDecoration roundedConrnerStaristic(Color color) {
+  return BoxDecoration(
+    border: Border.all(color: themeColor),
+    borderRadius: BorderRadius.circular(5),
+    color: color,
   );
 }

@@ -31,13 +31,19 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^1.0.3
+  hive_flutter: ^1.1.0
   intl: ^0.17.0
+  shared_preferences: ^2.0.13
   syncfusion_flutter_charts: ^19.4.56
 
 dev_dependencies:
+  build_runner: ^2.1.8
   flutter_lints: ^1.0.0
   flutter_test:
     sdk: flutter
+  hive_generator: ^1.1.2
+  path_provider: ^2.0.9
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -56,6 +62,7 @@ flutter:
     - lib/screens/onboarding_screen/assest/images/undraw_personal_goals_re_iow7
       1.svg
     - lib/screens/onboarding_screen/assest/images/imageofboard.svg
+    - lib/global/images/sentiment_very_dissatisfied.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

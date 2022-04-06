@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:money_land/screens/splash_screen/splash_screen.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
 import '../../global/styles.dart';
@@ -29,20 +30,17 @@ class OnboardingTwo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: mediaQuery(context, 0.05),
-          ),
 
           // ignore: prefer_const_constructors
-          SizedBox(
-            width: mediaQueryWidth(context, 0.45),
-            height: mediaQuery(context, 0.06),
+          Padding(
+            padding: const EdgeInsets.only(top: 40),
             child: ElevatedButton(
               onPressed: () {
+                sharedPreferences.setBool("move", true);
                 Navigator.pushReplacementNamed(context, '/home');
               },
               child: const Text(
-                "Next",
+                "   Next   ",
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,

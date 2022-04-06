@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_land/global/styles.dart';
+import 'package:money_land/main.dart';
 import 'package:money_land/themes/colors/colors.dart';
 
 class Settings extends StatefulWidget {
@@ -35,7 +36,15 @@ class _SettingsState extends State<Settings> {
       body: ListView.builder(
         itemBuilder: (context, index) {
           return ListTile(
-              leading: Icon(settings[index].icon),
+              leading: IconButton(
+                icon: Icon(settings[index].icon),
+                onPressed: () {
+                  if (index == 6) {
+                    print("object");
+                    db_Categories.clearHive();
+                  }
+                },
+              ),
               title: Text(
                 "${settings[index].title}",
                 style: const TextStyle(fontSize: 20),
