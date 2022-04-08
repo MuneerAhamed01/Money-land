@@ -14,7 +14,6 @@ Widget sizedBox(BuildContext context) {
 Widget textFields(TextEditingController controller, String label, int line) {
   return TextFormField(
     maxLines: line,
-    controller: controller,
     decoration: dec(label),
   );
 }

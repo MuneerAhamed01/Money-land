@@ -12,6 +12,7 @@ import '../../../database/database_crud/db_crud_categories.dart';
 import '../../../database/moneyland_model_class.dart';
 
 enum Creating { adding, editing }
+String typeOfText = '';
 
 String? category;
 final key = GlobalKey<FormState>();
@@ -20,66 +21,72 @@ bottomSheet(BuildContext context, String type, int index, Creating typeof,
     CategoryType dbType,
     {String? initial}) {
   showModalBottomSheet(
-      context: context,
-      builder: (ctx) {
-        return SizedBox(
-          height: mediaQuery(context, 0.50),
-          child: Container(
-              decoration: roundedConrnerCatgory(lightColor),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(top: 60, left: 20, right: 20),
-                      child: Form(
-                        // autovalidateMode: AutovalidateMode.onUserInteraction,
-                        key: key,
-                        child: TextFormField(
-                            initialValue:
-                                typeof == Creating.adding ? null : initial,
-                            decoration: dec(type),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Entered value is empty";
-                              } else if (showDuplicate(value, initial)) {
-                                return 'The Category already exist';
-                              } else {
-                                category = value;
-                                return null;
-                              }
-                            }),
-                      ),
-                    ),
-                    sizedBox(context),
-                    ElevatedButton(
-                        style: styleButtonBottom(ctx),
-                        onPressed: () {
-                          if (key.currentState!.validate()) {
-                            if (typeof == Creating.adding) {
-                              db_Categories.addCategory(
-                                  Categories(category: category, type: dbType));
-                              Navigator.pop(ctx);
-                            } else {
-                              db_Categories.updateCatogry(index,
-                                  Categories(category: category, type: dbType));
-                              Navigator.pop(ctx);
-                            }
+    context: context,
+    builder: (ctx) {
+      return SizedBox(
+        height: mediaQuery(context, 0.50),
+        child: Container(
+          decoration: roundedConrnerCatgory(lightColor),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 60, left: 20, right: 20),
+                  child: Form(
+                    // autovalidateMode: AutovalidateMode.onUserInteraction,
+                    key: key,
+                    child: TextFormField(
+                        initialValue:
+                            typeof == Creating.adding ? null : initial,
+                        decoration: dec(type),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            typeOfText = 'Entered value is empty';
+                            return "";
+                          } else if (showDuplicate(value, initial)) {
+                            typeOfText = 'The category is already available';
+                            return '';
+                          } else {
+                            category = value;
+                            return null;
                           }
-                        },
-                        child: const Text(
-                          "Save",
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ))
-                  ],
+                        }),
+                  ),
                 ),
-              )),
-        );
-      });
+                sizedBox(context),
+                ElevatedButton(
+                  style: styleButtonBottom(ctx),
+                  onPressed: () {
+                    if (key.currentState!.validate()) {
+                      if (typeof == Creating.adding) {
+                        db_Categories.addCategory(
+                            Categories(category: category, type: dbType));
+                        Navigator.pop(ctx);
+                      } else {
+                        db_Categories.updateCatogry(index,
+                            Categories(category: category, type: dbType));
+                        Navigator.pop(ctx);
+                      }
+                    } else {
+                      snackbarOf(ctx);
+                    }
+                  },
+                  child: const Text(
+                    "Save",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 bool showDuplicate(String value, String? initial) {
@@ -88,7 +95,8 @@ bool showDuplicate(String value, String? initial) {
   if (initial != value) {
     if (db.isNotEmpty) {
       for (int i = 0; i <= db.length - 1; i++) {
-        if (db[i].category == value) {
+        if (db[i].category!.toLowerCase().trim() ==
+            value.toLowerCase().trim()) {
           flag = 1;
           break;
         }
@@ -101,4 +109,17 @@ bool showDuplicate(String value, String? initial) {
     }
   }
   return false;
+}
+
+snackbarOf(BuildContext context) {
+  final snackBar = SnackBar(
+    content: Text(typeOfText),
+    backgroundColor: Colors.grey[600],
+    // padding: EdgeInsets.all(10),
+
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+    behavior: SnackBarBehavior.floating,
+  );
+  Navigator.pop(context);
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

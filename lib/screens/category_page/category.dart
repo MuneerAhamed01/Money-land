@@ -32,6 +32,7 @@ class _CategoryState extends State<Category>
   void handleIndex() {
     setState(() {});
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,6 @@ class _CategoryState extends State<Category>
             ? FloatingActionButton(
                 backgroundColor: themeColor,
                 onPressed: () {
-                  
                   bottomSheet(context, "ADD Income", _tabcontroller.index,
                       Creating.adding, CategoryType.income);
                   // addPage(box);
@@ -82,6 +82,7 @@ class _CategoryState extends State<Category>
                 onPressed: () {
                   bottomSheet(context, "ADD Expense", _tabcontroller.index,
                       Creating.adding, CategoryType.expense);
+                  
                 },
                 child: const Icon(
                   Icons.add,

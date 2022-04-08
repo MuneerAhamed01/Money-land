@@ -4,6 +4,7 @@ import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
 import 'package:money_land/screens/edit_screen/assest/widgets.dart';
+import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
@@ -83,7 +84,7 @@ class _EditScreenState extends State<EditScreen>
                                   dropdownColor: Colors.white,
                                   decoration: dec(""),
                                   value: selected,
-                                  items: category(selected, items),
+                                  items: null,
                                   onChanged: (item) {
                                     setValue(item);
                                   },
@@ -134,7 +135,7 @@ class _EditScreenState extends State<EditScreen>
 
   date() async {
     var formattedDate =
-        await datePicker(context, 'dd-MM-yyyy', DatePickerMode.day);
+        await datePicker(context, 'dd-MM-yyyy');
     setState(() {
       // _dateEditController.text = formattedDate;
     });

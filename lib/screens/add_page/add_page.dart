@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
+import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
+import 'package:money_land/main.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
+import 'package:money_land/screens/category_page/assest/functions.dart';
+import 'package:money_land/screens/homepage/home.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
@@ -15,14 +20,18 @@ class AddPage extends StatefulWidget {
   State<AddPage> createState() => _AddPageState();
 }
 
+DateTime now = DateTime.now();
+String currrentDate = DateFormat('dd-MM-yyyy').format(now);
+
 class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
   late TabController _tabControl;
 
   @override
   void initState() {
+    db_Categories.refreshUI();
     _tabControl = TabController(length: 2, vsync: this, initialIndex: 0);
     _tabControl.addListener(tabHandler);
-    // TODO: implement initState
+
     super.initState();
   }
 
@@ -30,14 +39,22 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     setState(() {});
   }
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
-  List<String> items = ['Loan', 'Vehicle', 'House'];
-  String? selected = 'Loan';
+  final keyAdd = GlobalKey<FormState>();
+  final TextEditingController _date = TextEditingController(text: currrentDate);
 
-  // String formattedDate = DateFormat(' EEE d MMM').format(date!);
+  List<String> items = ['Loan', 'Vehicle', 'House'];
+  DateTime? initialDate;
+  Categories? itemsOf;
+  Categories? itemsOn;
+
+  String? selected;
+  String? selectedExpense;
+
+  String? name;
+  String? dateof;
+  String? categoryOf;
+  String? amount;
+  String? notes;
 
   @override
   Widget build(BuildContext context) {
@@ -59,40 +76,109 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                 ),
               ),
               FormField(
+                  key: keyAdd,
                   builder: ((field) => Padding(
                         padding: const EdgeInsets.all(20),
                         child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              textFields(_nameController, 'Name', 1),
+                              TextFormField(
+                                maxLines: 1,
+                                decoration: dec("Name"),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "";
+                                  } else {
+                                    name = value;
+                                    return null;
+                                  }
+                                },
+                              ),
                               sizedBox(context),
                               TextFormField(
+                                controller: _date,
                                 readOnly: true,
-                                controller: _dateController,
-                                // focusNode: AlwaysDisabledFocusNode(),
                                 decoration: dec("Date"),
-                                onTap: () {
-                                  date();
+                                onTap: () async {
+                                  final formatteddate = await datePicker();
+                                  _date.text = formatteddate;
                                 },
                               ),
                               sizedBox(context),
                               SizedBox(
                                 width: double.infinity,
-                                child: DropdownButtonFormField<String>(
-                                  dropdownColor: Colors.white,
-                                  decoration: dec(""),
-                                  value: selected,
-                                  items: category(selected, items),
-                                  onChanged: (item) {
-                                    setValue(item);
-                                  },
-                                ),
+                                child: ValueListenableBuilder(
+                                    valueListenable: _tabControl.index == 0
+                                        ? db_Categories.income
+                                        : db_Categories.expense,
+                                    builder: (context,
+                                        List<Categories> categoryDowm, _) {
+                                      return DropdownButtonFormField<
+                                          Categories>(
+                                        value: _tabControl.index == 0
+                                            ? itemsOf
+                                            : itemsOn,
+                                        hint: const Text("Select Category"),
+                                        dropdownColor: Colors.white,
+                                        decoration: dec(""),
+                                        items: categoryDowm
+                                            .map((Categories item) =>
+                                                DropdownMenuItem<Categories>(
+                                                  value: item,
+                                                  child: Text(item.category!),
+                                                ))
+                                            .toList(),
+                                        onChanged: (item) {
+                                          if (_tabControl.index == 0) {
+                                            setState(() {
+                                              itemsOf = item!;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              itemsOn = item!;
+                                            });
+                                          }
+                                        },
+                                        isExpanded: true,
+                                        validator: (value) {
+                                          if (value!.category == null ||
+                                              value.category!.isEmpty) {
+                                            return '';
+                                          } else {
+                                            value.category = categoryOf;
+                                            return null;
+                                          }
+                                        },
+                                      );
+                                    }),
                               ),
                               sizedBox(context),
-                              textFields(_amountController, 'Amount', 1),
+                              TextFormField(
+                                keyboardType: TextInputType.number,
+                                maxLines: 1,
+                                decoration: dec("Amount"),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "";
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              ),
                               sizedBox(context),
-                              textFields(_notesController, 'Notes', 6),
+                              TextFormField(
+                                maxLines: 6,
+                                decoration: dec("Notes"),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "";
+                                  } else {
+                                    notes = value;
+                                    return null;
+                                  }
+                                },
+                              ),
                               sizedBox(context),
                               _tabControl.index == 0
                                   ? SizedBox(
@@ -131,17 +217,28 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     );
   }
 
-  date() async {
-    var formattedDate =
-        await datePicker(context, 'dd-MM-yyyy', DatePickerMode.day);
-    setState(() {
-      _dateController.text = formattedDate;
-    });
-  }
+  setValue(Categories? item, int controller) {}
 
-  setValue(String? item) {
-    setState(() {
-      selected = item;
-    });
+  Future<String> datePicker() async {
+    DateTime? date;
+
+    date = await showDatePicker(
+        initialEntryMode: DatePickerEntryMode.calendarOnly,
+        initialDatePickerMode: DatePickerMode.day,
+        context: context,
+        initialDate: initialDate ?? now,
+        firstDate: DateTime(now.year - 5),
+        lastDate: DateTime(now.year + 5));
+    if (date != null) {
+      String formattedDate = DateFormat("dd-MM-yyyy").format(date);
+      setState(() {
+        initialDate = date;
+        // _date.text = formattedDate;
+      });
+
+      return formattedDate;
+    } else {
+      return _date.text;
+    }
   }
 }

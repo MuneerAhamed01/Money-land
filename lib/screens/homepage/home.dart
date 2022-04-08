@@ -15,6 +15,9 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+DateTime now = DateTime.now();
+String formattedDate = DateFormat(' EEE d MMM').format(now);
+
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _date_in_home;
@@ -31,9 +34,6 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat(' EEE d MMM').format(now);
-
     return Scaffold(
       appBar: AppBar(
         shadowColor: Colors.transparent,
@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage>
                         style: boldText(17),
                       ),
                     ),
-                    title: Text("Engine Work"),
+                    title: const Text("Engine Work"),
                     subtitle: Text(formattedDate),
                     trailing: Text(
                       "₹ 500",

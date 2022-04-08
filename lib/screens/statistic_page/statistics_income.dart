@@ -5,6 +5,7 @@ import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/settings_page/settings.dart';
+import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -218,7 +219,7 @@ class _StatisticState extends State<StatisticIncome>
   }
 
   date(String format, DatePickerMode modeof) async {
-    var formattedDate = await datePicker(context, format, modeof);
+    var formattedDate = await datePicker(context, format);
     setState(() {
       day = formattedDate;
     });

@@ -5,6 +5,7 @@ import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/settings_page/settings.dart';
+import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -129,26 +130,24 @@ class _StatisticState extends State<Statistic>
                                 child: _dateController.index == 0
                                     ? InkWell(
                                         onTap: () =>
-                                            date('dd', DatePickerMode.day),
+                                            datePicker(context,'dd',),
                                         child: datePickerOf("Day", context))
                                     : _dateController.index == 1
                                         ? InkWell(
                                             onTap: () =>
-                                                date("MM", DatePickerMode.day),
+                                                datePicker(context,"MM"),
                                             child:
                                                 datePickerOf('Month', context))
                                         : _dateController.index == 2
                                             ? InkWell(
-                                                onTap: () => date("YYYY",
-                                                    DatePickerMode.year),
+                                                onTap: () => datePicker(context,"year"),
                                                 child: datePickerOf(
                                                     'year', context))
                                             : Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   InkWell(
-                                                      onTap: () => date("dd-mm",
-                                                          DatePickerMode.day),
+                                                      onTap: () => datePicker(context,"yyyy"),
                                                       child: datePickerOf(
                                                           "day", context)),
                                                   SizedBox(
@@ -156,8 +155,7 @@ class _StatisticState extends State<Statistic>
                                                         context, 0.01),
                                                   ),
                                                   InkWell(
-                                                      onTap: () => date("dd-mm",
-                                                          DatePickerMode.day),
+                                                      onTap: () => datePicker(context,"yyyy"),
                                                       child: datePickerOf(
                                                           "type", context))
                                                 ],
@@ -219,14 +217,14 @@ class _StatisticState extends State<Statistic>
     ontap.value = _dateController.index;
   }
 
-  date(String format, DatePickerMode modeof) async {
-    var formattedDate = await datePicker(context, format, modeof);
-    setState(() {
-      day = formattedDate;
-    });
+  // date(String format, DatePickerMode modeof) async {
+  //   var formattedDate = await datePicker(context, format, modeof);
+  //   setState(() {
+  //     day = formattedDate;
+  //   });
 
-    // print(placedAt);
-  }
+  //   // print(placedAt);
+  // }
 }
 
 class Datas {
