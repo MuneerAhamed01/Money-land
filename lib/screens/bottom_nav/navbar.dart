@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/add_page/add_page.dart';
-import 'package:money_land/screens/bottom_nav/assest/widget.dart';
 import 'package:money_land/screens/category_page/category.dart';
 import 'package:money_land/screens/homepage/home.dart';
 import 'package:money_land/screens/settings_page/settings.dart';
-import 'package:money_land/screens/statistic_page/statistic.dart';
 import 'package:money_land/themes/colors/colors.dart';
-import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
 import '../statistic_page/swap_page/swap_page.dart';
 
 class NavBar extends StatefulWidget {
-  const NavBar({Key? key}) : super(key: key);
+  const NavBar({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<NavBar> createState() => _NavBarState();

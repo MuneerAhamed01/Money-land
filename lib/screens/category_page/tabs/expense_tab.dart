@@ -6,13 +6,14 @@ import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/screens/category_page/assest/functions.dart';
 import 'package:money_land/screens/category_page/tabs/income_tab.dart';
+import 'package:money_land/themes/colors/colors.dart';
 
 import '../../../global/styles.dart';
 import '../../../themes/mediaquery/mediaquery.dart';
 
 // ignore: must_be_immutable
 class Expense extends StatefulWidget {
-  Expense({Key? key}) : super(key: key);
+  const Expense({Key? key}) : super(key: key);
 
   @override
   State<Expense> createState() => _ExpenseState();
@@ -22,7 +23,7 @@ class _ExpenseState extends State<Expense> {
   @override
   void initState() {
     db_Categories.refreshUI();
-    // TODO: implement initState
+
     super.initState();
   }
 
@@ -51,39 +52,42 @@ class _ExpenseState extends State<Expense> {
                       ),
                     ],
                   ))
-                : ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return const Divider();
-                    },
+                : ListView.builder(
+                    // separatorBuilder: (context, index) {
+                    //   return const Divider();
+                    // },
                     itemBuilder: (context, index) {
                       // final expense = addExpense(box.values.toList());
-                      return ListTile(
-                        title: Text(
-                          exp[index].category!,
-                          style: boldText(20),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                final int? ind = dbConnect( exp[index].category);
-                                bottomSheet(context, "Edit Expense", ind!,
-                                    Creating.editing, CategoryType.expense,
-                                    initial: exp[index].category);
-                              },
-                            ),
-                            SizedBox(
-                              width: mediaQueryWidth(context, 0.05),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () {
-                                showPopUp(exp[index]);
-                              },
-                            )
-                          ],
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: ListTile(
+                          title: Text(
+                            exp[index].category!,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 20),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  final int? ind =
+                                      dbConnect(exp[index].category);
+                                  bottomSheet(context, "Edit Expense", ind!,
+                                      Creating.editing, CategoryType.expense,
+                                      initial: exp[index].category);
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  showPopUp(exp[index]);
+                                },
+                              )
+                            ],
+                          ),
                         ),
                       );
                     },

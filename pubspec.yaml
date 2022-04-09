@@ -63,6 +63,7 @@ flutter:
       1.svg
     - lib/screens/onboarding_screen/assest/images/imageofboard.svg
     - lib/global/images/sentiment_very_dissatisfied.svg
+    - lib/global/images/Group 8.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

@@ -4,7 +4,7 @@ import '../../../themes/colors/colors.dart';
 
 BoxDecoration roundedConrnerCatgory(Color color) {
   return BoxDecoration(
-    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
     color: color,
   );
 }

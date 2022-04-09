@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/global/styles.dart';
-import 'package:money_land/screens/add_page/assest/widgets.dart';
+
 import 'package:money_land/screens/details_screeen/widgets/widgets.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';

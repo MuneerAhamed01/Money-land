@@ -18,20 +18,17 @@ class CategoriesAdapter extends TypeAdapter<Categories> {
     };
     return Categories(
       category: fields[0] as String?,
-      valueOf: fields[1] as bool?,
-      type: fields[3] as CategoryType?,
+      type: fields[1] as CategoryType?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Categories obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(2)
       ..writeByte(0)
       ..write(obj.category)
       ..writeByte(1)
-      ..write(obj.valueOf)
-      ..writeByte(3)
       ..write(obj.type);
   }
 
@@ -62,13 +59,14 @@ class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
       category: fields[2] as String?,
       amount: fields[3] as int?,
       notes: fields[4] as String?,
+      type: fields[5] as CategoryType?,
     );
   }
 
   @override
   void write(BinaryWriter writer, AddTransaction obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -78,7 +76,9 @@ class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
       ..writeByte(3)
       ..write(obj.amount)
       ..writeByte(4)
-      ..write(obj.notes);
+      ..write(obj.notes)
+      ..writeByte(5)
+      ..write(obj.type);
   }
 
   @override

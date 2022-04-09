@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
+import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
-import 'package:money_land/screens/add_page/assest/widgets.dart';
+import 'package:money_land/main.dart';
+import 'package:money_land/screens/category_page/assest/functions.dart';
+
 import 'package:money_land/screens/homepage/assest/functions.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/homepage/assest/widgets.dart';
@@ -21,16 +25,25 @@ String formattedDate = DateFormat(' EEE d MMM').format(now);
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _date_in_home;
-  @override
   void initState() {
     _date_in_home = TabController(length: 4, vsync: this);
     _date_in_home.addListener(settings);
     super.initState();
   }
 
+  bool visbleOf() {
+    if (Hive.box<AddTransaction>(db_transaction).isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   settings() {
     setState(() {});
   }
+
+  // ValueNotifier<bool> visible = ValueNotifier(fa);
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +95,7 @@ class _HomePageState extends State<HomePage>
                                         : _date_in_home.index == 1
                                             ? 'April'
                                             : '2022',
-                                    style: TextStyle(color: Colors.black),
+                                    style: const TextStyle(color: Colors.black),
                                   )),
                             ),
                             IconButton(
@@ -168,44 +181,77 @@ class _HomePageState extends State<HomePage>
               height: mediaQuery(context, 0.05),
             ),
             Divider(),
-            Padding(
-              padding: const EdgeInsets.only(left: 18),
-              child: Text(
-                "Recent Transaction",
-                style: boldText(17),
+            Visibility(
+              visible: visbleOf(),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 17.5),
+                child: Text(
+                  "Recent Transaction :",
+                  style: boldText(17),
+                ),
               ),
             ),
-            SizedBox(
-              height: mediaQuery(context, 0.02),
-            ),
-            ListView.separated(
-                controller: ScrollController(),
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/details');
-                    },
-                    leading: Container(
-                      alignment: Alignment.center,
-                      height: mediaQuery(context, 0.05),
-                      width: mediaQueryWidth(context, 0.12),
-                      decoration: roundedConrnerTwo(themeColor),
-                      child: Text(
-                        "EXP",
-                        style: boldText(17),
+            ValueListenableBuilder(
+                valueListenable:
+                    Hive.box<AddTransaction>(db_transaction).listenable(),
+                builder: (context, Box<AddTransaction> box, _) {
+                  final listBox = box.values.toList();
+                  if (listBox.isEmpty) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            "lib/global/images/Group 8.png",
+                            scale: 1.9,
+                            opacity: const AlwaysStoppedAnimation(100),
+                            color: themeColor,
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Text(
+                              "No transaction Found",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                       ),
-                    ),
-                    title: const Text("Engine Work"),
-                    subtitle: Text(formattedDate),
-                    trailing: Text(
-                      "₹ 500",
-                      style: boldText(25),
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) => Divider(),
-                itemCount: 10)
+                    );
+                  } else {
+                    return ListView.separated(
+                        controller: ScrollController(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final list = listBox[index];
+                          return ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/details');
+                            },
+                            leading: Container(
+                              alignment: Alignment.center,
+                              height: mediaQuery(context, 0.05),
+                              width: mediaQueryWidth(context, 0.12),
+                              decoration: roundedConrnerTwo(themeColor),
+                              child: Text(
+                                list.type == CategoryType.income
+                                    ? "INC"
+                                    : "EXP",
+                                style: boldText(17),
+                              ),
+                            ),
+                            title: Text(list.name!),
+                            subtitle: Text(list.date!),
+                            trailing: Text(
+                              "₹${list.amount}",
+                              style: boldText(25),
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemCount: listBox.length);
+                  }
+                })
           ],
         ),
       ),

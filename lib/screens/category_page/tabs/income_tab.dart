@@ -20,17 +20,13 @@ class _IncomeState extends State<Income> {
   @override
   void initState() {
     db_Categories.refreshUI();
-    // TODO: implement initState
+
     super.initState();
   }
 
   int? accesKey;
   @override
   Widget build(BuildContext context) {
-    // setState(() {
-    //
-    // });
-
     return Container(
       color: Colors.white,
       child: ValueListenableBuilder(
@@ -51,39 +47,41 @@ class _IncomeState extends State<Income> {
                       ),
                     ],
                   ))
-                : ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return const Divider();
-                    },
+                : ListView.builder(
+                    // separatorBuilder: (context, index) {
+                    //   return const Divider();
+                    // },
                     itemBuilder: (context, index) {
                       // addIncome(box.values.toList());
-                      return ListTile(
-                        title: Text(
-                          inc[index].category!,
-                          style: boldText(20),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                dbConnect(inc[index].category);
-                                bottomSheet(context, "Edit Income", accesKey!,
-                                    Creating.editing, CategoryType.income,
-                                    initial: inc[index].category);
-                              },
-                            ),
-                            SizedBox(
-                              width: mediaQueryWidth(context, 0.05),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () {
-                                showPopUp(inc[index]);
-                              },
-                            )
-                          ],
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: ListTile(
+                          title: Text(
+                            inc[index].category!,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 20),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  dbConnect(inc[index].category);
+                                  bottomSheet(context, "Edit Income", accesKey!,
+                                      Creating.editing, CategoryType.income,
+                                      initial: inc[index].category);
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  showPopUp(inc[index]);
+                                },
+                              )
+                            ],
+                          ),
                         ),
                       );
                     },

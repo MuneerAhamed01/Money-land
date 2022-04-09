@@ -41,7 +41,7 @@ class _SettingsState extends State<Settings> {
                 onPressed: () {
                   if (index == 6) {
                     print("object");
-                    db_Categories.clearHive();
+                    db_trans.clearTransactionHive();
                   }
                 },
               ),

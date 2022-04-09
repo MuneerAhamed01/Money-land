@@ -14,13 +14,12 @@ enum CategoryType {
 class Categories extends HiveObject {
   @HiveField(0)
   String? category;
-  @HiveField(1)
-  bool? valueOf;
+  
 
-  @HiveField(3)
+  @HiveField(1)
   CategoryType? type;
 
-  Categories({this.category, this.valueOf = false, this.type});
+  Categories({this.category, this.type});
 }
 
 @HiveType(typeId: 2)
@@ -35,12 +34,16 @@ class AddTransaction extends HiveObject {
   int? amount;
   @HiveField(4)
   String? notes;
+  @HiveField(5)
+  CategoryType? type;
+
   AddTransaction({
     this.name,
     this.date,
     this.category,
     this.amount,
     this.notes,
+    this.type,
   });
 }
 

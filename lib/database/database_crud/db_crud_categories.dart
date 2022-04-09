@@ -37,49 +37,7 @@ class CategoryDB {
   }
 
   deleteCategory(int key) {
-    final dbOpen = Hive.box<Categories>(db_Name).delete(key);
-    refreshUI();
-  }
-
-  updateCatogry(int index, Categories value) {
-    final dbOpen = Hive.box<Categories>(db_Name);
-    dbOpen.putAt(index, value);
-    refreshUI();
-  }
-
-  clearHive() {
-    final dbOpen = Hive.box<Categories>(db_Name);
-    dbOpen.clear();
-  }
-}
-
-class TransactionDB {
-  Future<void> addTransactions(AddTransaction value) async {
-    final dbOpen = Hive.box<AddTransaction>(db_transaction);
-
-    await dbOpen.add(value);
-    // refreshUI();
-  }
-
-  Future<List<AddTransaction>> getTrasaction() async {
-    final dbOpen = Hive.box<AddTransaction>(db_transaction);
-    return dbOpen.values.toList();
-  }
-
-  Future<void> refreshUI() async {
-    // final _categories = await getCategory();
-    // income.value.clear();
-    // expense.value.clear();
-    // Future.forEach(_categories, (Categories category) {
-    //   if (category.type == CategoryType.income) {
-    //     income.value.add(category);
-    //   } else {
-    //     expense.value.add(category);
-    //   }
-    // });
-  }
-
-  deleteCategory(int key) {
+    Hive.box<Categories>(db_Name).delete(key);
     refreshUI();
   }
 
