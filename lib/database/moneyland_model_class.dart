@@ -27,11 +27,11 @@ class AddTransaction extends HiveObject {
   @HiveField(0)
   String? name;
   @HiveField(1)
-  String? date;
+  DateTime? date;
   @HiveField(2)
-  String? category;
+   Categories? category;
   @HiveField(3)
-  int? amount;
+  double? amount;
   @HiveField(4)
   String? notes;
   @HiveField(5)

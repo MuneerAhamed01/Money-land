@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
+import 'package:money_land/screens/add_page/add_page.dart';
 import 'package:money_land/screens/bottom_nav/navbar.dart';
 import 'package:money_land/screens/details_screeen/details.dart';
-import 'package:money_land/screens/edit_screen/edit_screen.dart';
 
 import 'package:money_land/screens/onboarding_screen/onboarding_one.dart';
 import 'package:money_land/screens/onboarding_screen/onboarding_two.dart';
@@ -10,7 +9,6 @@ import 'package:money_land/screens/splash_screen/splash_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    final args = settings.arguments;
     // final args = settings.arguments;
 
     switch (settings.name) {
@@ -23,9 +21,14 @@ class RouteGenerator {
       case '/home':
         return MaterialPageRoute(builder: (context) => const NavBar());
       case '/details':
-        return MaterialPageRoute(builder: (context) => const DetailsPage());
+        final args = settings.arguments as Map;
+        return MaterialPageRoute(builder: (context) => DetailsPage(name: args));
       case '/editscreen':
-        return MaterialPageRoute(builder: (context) => const EditScreen());
+        final args = settings.arguments as Map;
+        return MaterialPageRoute(
+            builder: (context) => AddPage(
+                  editValues: args,
+                ));
       default:
         return MaterialPageRoute(builder: (context) => const Splashscreen());
     }

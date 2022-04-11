@@ -22,11 +22,13 @@ class _NavBarState extends State<NavBar> {
   List screens = [
     const HomePage(),
     const SwapInStatics(),
-    const AddPage(),
+    const AddPage(
+      editValues: {},
+    ),
     const Category(),
     const Settings()
   ];
-  var currentIndex = 0;
+  int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

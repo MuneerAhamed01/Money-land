@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
-import 'package:money_land/global/styles.dart';
+import 'package:money_land/database/moneyland_model_class.dart';
+import 'package:money_land/main.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
-import 'package:money_land/screens/add_page/assest/widgets.dart';
+import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
-import 'package:money_land/screens/settings_page/settings.dart';
 import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../add_page/assest/functions.dart';
+import '../homepage/assest/functions.dart';
 import 'assests/widgets.dart';
 
 class StatisticIncome extends StatefulWidget {
@@ -45,162 +46,244 @@ class _StatisticState extends State<StatisticIncome>
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat(' EEE d MMM').format(now);
+    List<AddTransaction> transaction =
+        Hive.box<AddTransaction>(db_transaction).values.toList();
+    final double totalIncome =
+        totalTransaction(transaction, CategoryType.income);
     return SafeArea(
-      child: Scaffold(
-          // backgroundColor: lightColor,
-
-          body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              color: Colors.white,
-              height: mediaQuery(context, 0.18),
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "My Earnings :",
-                        style: boldText(22),
-                      ),
-                      SizedBox(
-                        height: mediaQuery(context, 0.02),
-                      ),
-                      Text(
-                        "₹ 10,000",
-                        style: boldText(60),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              decoration:
-                  roundedConrnerStatic(Color.fromARGB(172, 255, 240, 240)),
-              // height: mediaQuery(context, 1),
-              width: double.infinity,
+      child: ScrollConfiguration(
+        behavior: const ScrollBehavior(
+            androidOverscrollIndicator: AndroidOverscrollIndicator.glow),
+        child: Scaffold(
+            backgroundColor: const Color.fromARGB(255, 255, 238, 238),
+            body: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SfCircularChart(
-                    legend: Legend(
-                      isVisible: true,
-                      position: LegendPosition.bottom,
+                  Container(
+                    color: Colors.white,
+                    height: mediaQuery(context, 0.18),
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "My Earnings :",
+                              style: boldText(22),
+                            ),
+                            SizedBox(
+                              height: mediaQuery(context, 0.02),
+                            ),
+                            Text(
+                              "₹ $totalIncome",
+                              style: boldText(60),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
-                    series: <CircularSeries>[
-                      DoughnutSeries<Datas, String>(
-                        dataLabelSettings: const DataLabelSettings(
-                            isVisible: true,
-                            labelPosition: ChartDataLabelPosition.outside),
-                        dataSource: chartsof,
-                        xValueMapper: (Datas data, _) => data.category,
-                        yValueMapper: (Datas data, _) => data.amount,
-                      )
-                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.start,
+                  Container(
+                    decoration: roundedConrnerStatic(
+                        const Color.fromARGB(255, 255, 238, 238)),
+                    // height: mediaQuery(context, 1),
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: TabBar(
-                            labelColor: Colors.black,
-                            indicatorSize: TabBarIndicatorSize.tab,
-                            indicator: circleDate(themeColor),
-                            tabs: const [
-                              Tab(text: 'D'),
-                              Tab(text: 'M'),
-                              Tab(text: 'Y'),
-                              Tab(text: 'P'),
+                        SfCircularChart(
+                          legend: Legend(
+                            isVisible: true,
+                            position: LegendPosition.bottom,
+                          ),
+                          series: <CircularSeries>[
+                            DoughnutSeries<Datas, String>(
+                              dataLabelSettings: const DataLabelSettings(
+                                  isVisible: true,
+                                  labelPosition:
+                                      ChartDataLabelPosition.outside),
+                              dataSource: chartsof,
+                              xValueMapper: (Datas data, _) => data.category,
+                              yValueMapper: (Datas data, _) => data.amount,
+                            )
+                          ],
+                        ),
+                        Padding(
+                          padding: _dateController.index <= 2
+                              ? const EdgeInsets.symmetric(horizontal: 20)
+                              : const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                            // mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: TabBar(
+                                  labelColor: Colors.black,
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  indicator: circleDate(themeColor),
+                                  tabs: const [
+                                    Tab(text: 'D'),
+                                    Tab(text: 'M'),
+                                    Tab(text: 'Y'),
+                                    Tab(text: 'P'),
+                                  ],
+                                  controller: _dateController,
+                                ),
+                              ),
+                              SizedBox(
+                                width: mediaQueryWidth(context, 0.25),
+                              ),
+                              Container(
+                                  child: _dateController.index == 0
+                                      ? InkWell(
+                                          onTap: () =>
+                                              date('dd', DatePickerMode.day),
+                                          child: datePickerOf("Day", context))
+                                      : _dateController.index == 1
+                                          ? InkWell(
+                                              onTap: () => date(
+                                                  "MM", DatePickerMode.day),
+                                              child: datePickerOf(
+                                                  'Month', context))
+                                          : _dateController.index == 2
+                                              ? InkWell(
+                                                  onTap: () => date("YYYY",
+                                                      DatePickerMode.year),
+                                                  child: datePickerOf(
+                                                      'year', context))
+                                              : Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    InkWell(
+                                                        onTap: () => date(
+                                                            "dd-mm",
+                                                            DatePickerMode.day),
+                                                        child: datePickerOf(
+                                                            "day", context)),
+                                                    SizedBox(
+                                                      width: mediaQueryWidth(
+                                                          context, 0.01),
+                                                    ),
+                                                    InkWell(
+                                                        onTap: () => date(
+                                                            "dd-mm",
+                                                            DatePickerMode.day),
+                                                        child: datePickerOf(
+                                                            "type", context))
+                                                  ],
+                                                ))
                             ],
-                            controller: _dateController,
                           ),
                         ),
-                        SizedBox(
-                          width: mediaQueryWidth(context, 0.25),
+                        const Padding(
+                          padding:
+                              EdgeInsets.only(top: 10, left: 20, right: 20),
+                          child: Divider(),
                         ),
-                        Container(
-                            child: _dateController.index == 0
-                                ? InkWell(
-                                    onTap: () => date('dd', DatePickerMode.day),
-                                    child: datePickerOf("Day", context))
-                                : _dateController.index == 1
-                                    ? InkWell(
-                                        onTap: () =>
-                                            date("MM", DatePickerMode.day),
-                                        child: datePickerOf('Month', context))
-                                    : _dateController.index == 2
-                                        ? InkWell(
-                                            onTap: () => date(
-                                                "YYYY", DatePickerMode.year),
-                                            child:
-                                                datePickerOf('year', context))
-                                        : Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              InkWell(
-                                                  onTap: () => date("dd-mm",
-                                                      DatePickerMode.day),
-                                                  child: datePickerOf(
-                                                      "day", context)),
-                                              SizedBox(
-                                                width: mediaQueryWidth(
-                                                    context, 0.01),
-                                              ),
-                                              InkWell(
-                                                  onTap: () => date("dd-mm",
-                                                      DatePickerMode.day),
-                                                  child: datePickerOf(
-                                                      "type", context))
-                                            ],
-                                          ))
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: ValueListenableBuilder(
+                              valueListenable:
+                                  Hive.box<AddTransaction>(db_transaction)
+                                      .listenable(),
+                              builder: (context, Box<AddTransaction> box, _) {
+                                final List<AddTransaction> list =
+                                    box.values.toList();
+                                final List<AddTransaction> income =
+                                    splitTransaction(list, CategoryType.income);
+
+                                if (income.isEmpty) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 60),
+                                    child: Center(
+                                      child: Column(
+                                        children: [
+                                          Image.asset(
+                                            "lib/global/images/Group 8.png",
+                                            scale: 1.9,
+                                            opacity:
+                                                const AlwaysStoppedAnimation(
+                                                    100),
+                                            color: themeColor,
+                                          ),
+                                          const Padding(
+                                            padding: EdgeInsets.only(top: 10),
+                                            child: Text(
+                                              "No transaction Found",
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ],
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return ListView.separated(
+                                      controller: ScrollController(),
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        final incomeList = income[index];
+                                        final accessKey =
+                                            getKey(list, incomeList.name!);
+                                        String formattedDate =
+                                            DateFormat('dd-MM-yyyy')
+                                                .format(incomeList.date!);
+                                        return ListTile(
+                                          onLongPress: () => alertDialog(
+                                              incomeList.key, context),
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/details',
+                                                arguments: {
+                                                  "purpose": incomeList.name,
+                                                  "date": incomeList.date,
+                                                  "category":
+                                                      incomeList.category,
+                                                  "amount": incomeList.amount,
+                                                  "notes": incomeList.notes,
+                                                  "key": accessKey,
+                                                  "type": incomeList.type
+                                                });
+                                          },
+                                          leading: Container(
+                                            alignment: Alignment.center,
+                                            height: mediaQuery(context, 0.05),
+                                            width:
+                                                mediaQueryWidth(context, 0.12),
+                                            decoration:
+                                                roundedConrnerTwo(themeColor),
+                                            child: Text(
+                                              "INC",
+                                              style: boldText(17),
+                                            ),
+                                          ),
+                                          title: Text(incomeList.name!),
+                                          subtitle: Text(formattedDate),
+                                          trailing: Text(
+                                            "₹ ${incomeList.amount}",
+                                            style: boldText(25),
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          const Divider(),
+                                      itemCount: income.length);
+                                }
+                              }),
+                        )
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: ListView.separated(
-                        controller: ScrollController(),
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/details');
-                            },
-                            leading: Container(
-                              alignment: Alignment.center,
-                              height: mediaQuery(context, 0.05),
-                              width: mediaQueryWidth(context, 0.12),
-                              decoration: roundedConrnerTwo(themeColor),
-                              child: Text(
-                                "INC",
-                                style: boldText(17),
-                              ),
-                            ),
-                            title: Text("Salary"),
-                            subtitle: Text(formattedDate),
-                            trailing: Text(
-                              "₹ 500",
-                              style: boldText(25),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, index) => Divider(),
-                        itemCount: 10),
-                  )
                 ],
               ),
-            ),
-          ],
-        ),
-      )),
+            )),
+      ),
     );
   }
 
@@ -225,6 +308,31 @@ class _StatisticState extends State<StatisticIncome>
     });
 
     // print(placedAt);
+  }
+
+  alertDialog(int key, BuildContext context) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        // contentPadding: EdgeInsets.only(left: 20),
+        content: const Text('You want to delete the transaction'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'Cancel'),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              db_trans.deleteTransaction(key);
+              Navigator.pop(context, 'OK');
+              setState(() {});
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }
 

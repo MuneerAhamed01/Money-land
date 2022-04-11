@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
+import '../../../database/moneyland_model_class.dart';
 import '../../statistic_page/assests/widgets.dart';
 
 showDate(BuildContext context, TabController controller) {
@@ -30,7 +33,7 @@ showDate(BuildContext context, TabController controller) {
               ),
               TextButton(
                   onPressed: () {
-                    Navigator.pop(ctx); 
+                    Navigator.pop(ctx);
                   },
                   child: const Text(
                     "SAVE",
@@ -40,4 +43,27 @@ showDate(BuildContext context, TabController controller) {
           ),
         );
       });
+}
+
+double totalTransaction(List<AddTransaction> exp, CategoryType type) {
+  double totaltransactionOf = 0;
+
+  for (var i = 0; i < exp.length; i++) {
+    if (exp[i].type == type) {
+      totaltransactionOf = exp[i].amount! + totaltransactionOf;
+    }
+  }
+  return totaltransactionOf;
+}
+
+int? getKey(List<AddTransaction> getKey, String name) {
+  int? accessKey;
+
+  for (var i = 0; i < getKey.length; i++) {
+    if (getKey[i].name == name) {
+      accessKey = getKey[i].key;
+      break;
+    }
+  }
+  return accessKey;
 }

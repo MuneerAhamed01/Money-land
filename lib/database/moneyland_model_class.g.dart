@@ -55,9 +55,9 @@ class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
     };
     return AddTransaction(
       name: fields[0] as String?,
-      date: fields[1] as String?,
-      category: fields[2] as String?,
-      amount: fields[3] as int?,
+      date: fields[1] as DateTime?,
+      category: fields[2] as Categories?,
+      amount: fields[3] as double?,
       notes: fields[4] as String?,
       type: fields[5] as CategoryType?,
     );

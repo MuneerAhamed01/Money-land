@@ -1,21 +1,19 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
-import 'package:money_land/database/moneyland_model_class.dart';
 
+import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
-
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
-import 'assest/functions.dart';
-
 class AddPage extends StatefulWidget {
-  const AddPage({Key? key}) : super(key: key);
+  final Map editValues;
+  const AddPage({
+    Key? key,
+    required this.editValues,
+  }) : super(key: key);
 
   @override
   State<AddPage> createState() => _AddPageState();
@@ -30,7 +28,14 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     db_Categories.refreshUI();
-    _tabControl = TabController(length: 2, vsync: this, initialIndex: 0);
+    _tabControl = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: widget.editValues.isEmpty
+            ? 0
+            : widget.editValues["type"] == CategoryType.expense
+                ? 1
+                : 0);
     _tabControl.addListener(tabHandler);
 
     super.initState();
@@ -40,15 +45,19 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     setState(() {});
   }
 
+  String editDate = DateFormat('dd-MM-yyyy').format(now);
   final keyAdd = GlobalKey<FormState>();
-  final TextEditingController _date = TextEditingController(text: currrentDate);
+
+  final TextEditingController _date = TextEditingController();
+
+  // final TextEditingController _edit = TextEditingController(text: currrentDate);
 
   String? selected;
   String? selectedExpense;
   String? name;
   String? dateof;
-  String? categoryOf;
-  int? amount;
+  Categories? categoryOf;
+  double? amount;
   String? notes;
   DateTime? initialDate;
   Categories? itemsOf;
@@ -56,6 +65,17 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final Map initialValues = widget.editValues;
+    if (_date.text.isEmpty) {
+      if (initialValues.isEmpty) {
+        _date.text = currrentDate;
+      } else {
+        String initialDateEdit =
+            DateFormat("dd-MM-yyyy").format(initialValues["date"]);
+        _date.text = initialDateEdit;
+      }
+    }
+
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -82,8 +102,12 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           TextFormField(
+                            initialValue: initialValues.isEmpty
+                                ? null
+                                : initialValues["purpose"],
                             maxLines: 1,
-                            decoration: dec("Name"),
+                            decoration: dec(
+                                _tabControl.index == 0 ? "Form" : "Purpose"),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "";
@@ -151,7 +175,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                           value.category!.isEmpty) {
                                         return '';
                                       } else {
-                                        categoryOf = value.category;
+                                        categoryOf = value;
                                         return null;
                                       }
                                     },
@@ -160,6 +184,9 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           ),
                           sizedBox(context),
                           TextFormField(
+                            initialValue: initialValues.isEmpty
+                                ? null
+                                : initialValues["amount"].toString(),
                             keyboardType: TextInputType.number,
                             maxLines: 1,
                             decoration: dec("Amount"),
@@ -167,7 +194,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                               if (value == null || value.isEmpty) {
                                 return "";
                               } else {
-                                final valueInt = int.parse(value);
+                                final valueInt = double.parse(value);
                                 amount = valueInt;
                                 return null;
                               }
@@ -175,17 +202,19 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           ),
                           sizedBox(context),
                           TextFormField(
-                            maxLines: 6,
-                            decoration: dec("Notes"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "";
-                              } else {
-                                notes = value;
-                                return null;
-                              }
-                            },
-                          ),
+                              initialValue: initialValues.isEmpty
+                                  ? null
+                                  : initialValues["notes"],
+                              maxLines: 6,
+                              decoration: dec("Notes"),
+                              validator: (value) {
+                                if (value == null) {
+                                  return '';
+                                } else {
+                                  notes = value;
+                                  return null;
+                                }
+                              }),
                           sizedBox(context),
                           SizedBox(
                             width: mediaQueryWidth(context, 0.25),
@@ -237,34 +266,61 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     if (keyAdd.currentState!.validate()) {
       showDialog<String>(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
+        builder: (BuildContext ctx) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           // contentPadding: EdgeInsets.only(left: 20),
-          content: const Text('Do you want to save the Transaction'),
+          content: Text(widget.editValues.isEmpty
+              ? 'Do you want to save the Transaction'
+              : 'Save the Changes'),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.pop(context, 'Cancel'),
+              onPressed: () => Navigator.pop(ctx, 'Cancel'),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                if (_tabControl.index == 0) {
-                  db_trans.addTransactions(AddTransaction(
-                      name: name,
-                      date: dateof,
-                      category: categoryOf,
-                      amount: amount,
-                      notes: notes,
-                      type: CategoryType.income));
+                if (widget.editValues.isEmpty) {
+                  if (_tabControl.index == 0) {
+                    db_trans.addTransactions(AddTransaction(
+                        name: name,
+                        date: initialDate ?? now,
+                        category: categoryOf,
+                        amount: amount,
+                        notes: notes,
+                        type: CategoryType.income));
+                  } else {
+                    db_trans.addTransactions(AddTransaction(
+                        name: name,
+                        date: initialDate ?? now,
+                        category: categoryOf,
+                        amount: amount,
+                        notes: notes,
+                        type: CategoryType.expense));
+                  }
                 } else {
-                  db_trans.addTransactions(AddTransaction(
-                      name: name,
-                      date: dateof,
-                      category: categoryOf,
-                      amount: amount,
-                      notes: notes,
-                      type: CategoryType.expense));
+                  if (_tabControl.index == 0) {
+                    db_trans.updateTransaction(
+                        widget.editValues["key"],
+                        AddTransaction(
+                            name: name,
+                            date: initialDate ?? now,
+                            category: categoryOf,
+                            amount: amount,
+                            notes: notes,
+                            type: CategoryType.income));
+                  } else {
+                    db_trans.updateTransaction(
+                        widget.editValues["key"],
+                        AddTransaction(
+                            name: name,
+                            date: initialDate ?? widget.editValues["date"],
+                            category: categoryOf,
+                            amount: amount,
+                            notes: notes,
+                            type: CategoryType.expense));
+                  }
                 }
+                Navigator.pop(ctx);
                 Navigator.pushReplacementNamed(context, '/home');
               },
               child: const Text('OK'),
@@ -282,6 +338,17 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
         backgroundColor: Colors.grey[600],
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  String initialValueOfDate() {
+    if (widget.editValues.isEmpty) {
+      return currrentDate;
+    } else {
+      final showEditInitial = widget.editValues[1];
+
+      String initDate = DateFormat("dd-MM-yyyy").format(showEditInitial);
+      return initDate;
     }
   }
 }

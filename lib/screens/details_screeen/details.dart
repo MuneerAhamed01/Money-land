@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:money_land/global/styles.dart';
+import 'package:money_land/database/moneyland_model_class.dart';
 
+import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/details_screeen/widgets/widgets.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
 class DetailsPage extends StatelessWidget {
-  const DetailsPage({Key? key}) : super(key: key);
+  const DetailsPage({
+    Key? key,
+    required this.name,
+  }) : super(key: key);
+  final Map? name;
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat(' EEE d MMM').format(now);
+    String formattedDate = DateFormat(' EEE d MMM').format(name!["date"]);
+    final Categories data = name!["category"];
+
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -53,7 +59,7 @@ class DetailsPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Engine Work",
+                        name!["purpose"],
                         style: boldText(30),
                       ),
                       Text(
@@ -70,22 +76,25 @@ class DetailsPage extends StatelessWidget {
                     height: mediaQuery(context, 0.02),
                   ),
                   textShow(
-                    '₹ 500',
+                    '₹ ${name!["amount"]}',
                     const TextStyle(fontSize: 35),
                   ),
                   SizedBox(height: mediaQuery(context, 0.06)),
                   textShow("Category :", boldText(35)),
                   SizedBox(height: mediaQuery(context, 0.02)),
-                  textShow("Vehicle", const TextStyle(fontSize: 35)),
+                  textShow(data.category!, const TextStyle(fontSize: 25)),
                   SizedBox(height: mediaQuery(context, 0.06)),
                   textShow("Notes :", boldText(35)),
                   SizedBox(height: mediaQuery(context, 0.02)),
-                  textShow(
-                      "Engine repair of bike", const TextStyle(fontSize: 25)),
+                  textShow(name!["notes"], const TextStyle(fontSize: 25)),
                   SizedBox(height: mediaQuery(context, 0.06)),
                   textShow("Type :", boldText(35)),
                   SizedBox(height: mediaQuery(context, 0.02)),
-                  textShow('Expense', const TextStyle(fontSize: 25))
+                  textShow(
+                      name!["type"] == CategoryType.income
+                          ? "Income"
+                          : "Expense",
+                      const TextStyle(fontSize: 25))
                 ],
               ),
             ),
@@ -94,6 +103,6 @@ class DetailsPage extends StatelessWidget {
   }
 
   navigateToEdit(BuildContext context) {
-    Navigator.pushNamed(context, "/editscreen");
+    Navigator.pushNamed(context, "/editscreen", arguments: name);
   }
 }

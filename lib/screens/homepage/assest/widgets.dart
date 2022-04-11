@@ -17,7 +17,7 @@ Widget transactionContainer(
         decoration: roundedConrner(const Color.fromARGB(255, 233, 121, 121)),
         child: Text(amount,
             style: const TextStyle(
-                fontSize: 50,
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
                 color: Colors.black)),
       ),
@@ -55,8 +55,8 @@ Widget datePickerOfHome(String type, BuildContext context) {
     decoration: roundedConrnerHome(lightColor),
     child: Text(
       type,
-      style: TextStyle(
-        color: Colors.black,
+      style: const TextStyle(
+        color: Colors.white,
       ),
       textAlign: TextAlign.center,
     ),
