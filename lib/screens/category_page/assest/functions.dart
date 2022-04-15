@@ -123,3 +123,12 @@ snackbarOf(BuildContext context) {
   Navigator.pop(context);
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
+
+categorySelector(List<AddTransaction> listTrans, Categories categories) {
+  for (var i = 0; i < listTrans.length; i++) {
+    if (listTrans[i].category!.category == categories.category) {
+      final deleteTrans = listTrans[i].key;
+      db_trans.deleteTransaction(deleteTrans);
+    }
+  }
+}

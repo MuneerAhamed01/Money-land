@@ -1,13 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:money_land/global/styles.dart';
+
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
 import '../../../database/moneyland_model_class.dart';
-import '../../statistic_page/assests/widgets.dart';
 
 showDate(BuildContext context, TabController controller) {
   showModalBottomSheet(
@@ -56,14 +55,54 @@ double totalTransaction(List<AddTransaction> exp, CategoryType type) {
   return totaltransactionOf;
 }
 
-int? getKey(List<AddTransaction> getKey, String name) {
+int? getKey(List<AddTransaction> getKey, int key) {
   int? accessKey;
 
   for (var i = 0; i < getKey.length; i++) {
-    if (getKey[i].name == name) {
+    if (getKey[i].key == key) {
       accessKey = getKey[i].key;
       break;
     }
   }
   return accessKey;
+}
+
+List<AddTransaction> gotoFilter(
+    {required DateTime range,
+    required TabController controller,
+    required List<AddTransaction> list,
+    required DateTimeRange dateTimeRange}) {
+  List<AddTransaction> filteredList = [];
+  if (controller.index <= 2) {
+    for (var i = 0; i < list.length; i++) {
+      if (controller.index == 0) {
+        if (list[i].date!.day == range.day &&
+            list[i].date!.month == range.month &&
+            list[i].date!.year == range.year) {
+          filteredList.add(list[i]);
+        }
+      } else if (controller.index == 1) {
+        if (list[i].date!.month == range.month &&
+            list[i].date!.year == range.year) {
+          filteredList.add(list[i]);
+        }
+      } else {
+        if (list[i].date!.year == range.year) {
+          filteredList.add(list[i]);
+        }
+      }
+    }
+  } else {
+    for (var i = 0; i < list.length; i++) {
+      final dateAfter = dateTimeRange.start.subtract(const Duration(days: 1));
+      final dateBefore = dateTimeRange.end.add(const Duration(days: 1));
+
+      if (list[i].date!.isAfter(dateAfter) &&
+          list[i].date!.isBefore(dateBefore)) {
+        filteredList.add(list[i]);
+      }
+    }
+  }
+
+  return filteredList;
 }

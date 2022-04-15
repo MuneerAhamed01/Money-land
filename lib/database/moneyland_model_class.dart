@@ -1,5 +1,4 @@
 import 'package:hive_flutter/adapters.dart';
-
 part 'moneyland_model_class.g.dart';
 
 @HiveType(typeId: 1)
@@ -14,7 +13,6 @@ enum CategoryType {
 class Categories extends HiveObject {
   @HiveField(0)
   String? category;
-  
 
   @HiveField(1)
   CategoryType? type;
@@ -25,20 +23,17 @@ class Categories extends HiveObject {
 @HiveType(typeId: 2)
 class AddTransaction extends HiveObject {
   @HiveField(0)
-  String? name;
-  @HiveField(1)
   DateTime? date;
+  @HiveField(1)
+  Categories? category;
   @HiveField(2)
-   Categories? category;
-  @HiveField(3)
   double? amount;
-  @HiveField(4)
+  @HiveField(3)
   String? notes;
-  @HiveField(5)
+  @HiveField(4)
   CategoryType? type;
 
   AddTransaction({
-    this.name,
     this.date,
     this.category,
     this.amount,

@@ -11,6 +11,7 @@ class SwapInStatics extends StatefulWidget {
 
 class _SwapInStaticsState extends State<SwapInStatics> {
   bool swaped = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +24,7 @@ class _SwapInStaticsState extends State<SwapInStatics> {
                 shadowColor: Colors.transparent,
                 actions: [
                   IconButton(
-                      onPressed: () async {
+                      onPressed: () {
                         setState(() {
                           swaped = !swaped;
                         });

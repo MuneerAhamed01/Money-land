@@ -3,15 +3,17 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/main.dart';
+import 'package:money_land/screens/homepage/home.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
-
+import 'package:flutter_slidable/flutter_slidable.dart';
+import '../../global/functions/functions.dart';
 import '../homepage/assest/functions.dart';
+import '../homepage/assest/widgets.dart';
 import 'assests/widgets.dart';
 
 class StatisticIncome extends StatefulWidget {
@@ -21,6 +23,9 @@ class StatisticIncome extends StatefulWidget {
   State<StatisticIncome> createState() => _StatisticState();
 }
 
+final initialDate = DateTimeRange(
+    start: DateTime.now(), end: DateTime.now().add(const Duration(days: 3)));
+
 class _StatisticState extends State<StatisticIncome>
     with SingleTickerProviderStateMixin {
   late TabController _dateController;
@@ -29,7 +34,7 @@ class _StatisticState extends State<StatisticIncome>
   @override
   void initState() {
     chartsof = chartView();
-    _dateController = TabController(length: 4, vsync: this, initialIndex: 0);
+    _dateController = TabController(length: 4, vsync: this, initialIndex: 1);
     _dateController.addListener(Setting);
     // TODO: implement initState
     super.initState();
@@ -43,13 +48,32 @@ class _StatisticState extends State<StatisticIncome>
   String day = "01";
   String month = 'month';
   String year = "year";
+  DateTime monthPicker = DateTime.now();
+  String? formattedMonth;
+  String? formattedYear;
+  String? formateDay;
+  DateTimeRange range = initialDate;
+  String? rangeTextStart;
+  String? rangeTextEnd;
 
   @override
   Widget build(BuildContext context) {
+    formattedMonth = DateFormat('MMM').format(monthPicker);
+    formateDay = DateFormat('dd-MM-yy').format(monthPicker);
+    formattedYear = DateFormat('yyyy').format(monthPicker);
+
+    rangeTextStart = DateFormat('dd-MM-yy').format(range.start);
+    rangeTextEnd = DateFormat('dd-MM-yy').format(range.end);
+
     List<AddTransaction> transaction =
         Hive.box<AddTransaction>(db_transaction).values.toList();
+    final filteredList = gotoFilter(
+        range: monthPicker,
+        controller: _dateController,
+        list: transaction,
+        dateTimeRange: range);
     final double totalIncome =
-        totalTransaction(transaction, CategoryType.income);
+        totalTransaction(filteredList, CategoryType.income);
     return SafeArea(
       child: ScrollConfiguration(
         behavior: const ScrollBehavior(
@@ -137,51 +161,77 @@ class _StatisticState extends State<StatisticIncome>
                               Container(
                                   child: _dateController.index == 0
                                       ? InkWell(
-                                          onTap: () =>
-                                              date('dd', DatePickerMode.day),
-                                          child: datePickerOf("Day", context))
+                                          onTap: () async {
+                                            monthPicker = await datePicker(
+                                                context, 'dd', monthPicker);
+                                            setState(() {});
+                                          },
+                                          child: datePickerOf(
+                                              formateDay ?? "Day", context))
                                       : _dateController.index == 1
                                           ? InkWell(
-                                              onTap: () => date(
-                                                  "MM", DatePickerMode.day),
+                                              onTap: () async {
+                                                monthPicker =
+                                                    await datePickerNew(
+                                                        context,
+                                                        _dateController,
+                                                        monthPicker);
+                                                setState(() {});
+                                              },
                                               child: datePickerOf(
-                                                  'Month', context))
+                                                  formattedMonth ?? 'Month',
+                                                  context))
                                           : _dateController.index == 2
                                               ? InkWell(
-                                                  onTap: () => date("YYYY",
-                                                      DatePickerMode.year),
+                                                  onTap: () async {
+                                                    monthPicker =
+                                                        await datePickerNew(
+                                                            context,
+                                                            _dateController,
+                                                            monthPicker);
+                                                    setState(() {});
+                                                  },
                                                   child: datePickerOf(
-                                                      'year', context))
+                                                      formattedYear ?? "Year",
+                                                      context))
                                               : Row(
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: [
                                                     InkWell(
-                                                        onTap: () => date(
-                                                            "dd-mm",
-                                                            DatePickerMode.day),
+                                                        onTap: () async {
+                                                          range =
+                                                              await dateRangePicker(
+                                                                  context,
+                                                                  range);
+                                                          setState(() {});
+                                                        },
                                                         child: datePickerOf(
-                                                            "day", context)),
+                                                            rangeTextStart ??
+                                                                "From",
+                                                            context)),
                                                     SizedBox(
                                                       width: mediaQueryWidth(
                                                           context, 0.01),
                                                     ),
                                                     InkWell(
-                                                        onTap: () => date(
-                                                            "dd-mm",
-                                                            DatePickerMode.day),
+                                                        onTap: () async {
+                                                          range =
+                                                              await dateRangePicker(
+                                                                  context,
+                                                                  range);
+                                                          setState(() {});
+                                                        },
                                                         child: datePickerOf(
-                                                            "type", context))
+                                                            rangeTextEnd ??
+                                                                "To",
+                                                            context))
                                                   ],
                                                 ))
                             ],
                           ),
                         ),
-                        const Padding(
-                          padding:
-                              EdgeInsets.only(top: 10, left: 20, right: 20),
-                          child: Divider(),
-                        ),
+                        const Divider(),
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: ValueListenableBuilder(
@@ -193,8 +243,13 @@ class _StatisticState extends State<StatisticIncome>
                                     box.values.toList();
                                 final List<AddTransaction> income =
                                     splitTransaction(list, CategoryType.income);
+                                final filteredList = gotoFilter(
+                                    controller: _dateController,
+                                    dateTimeRange: range,
+                                    list: income,
+                                    range: monthPicker);
 
-                                if (income.isEmpty) {
+                                if (filteredList.isEmpty) {
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 60),
                                     child: Center(
@@ -228,20 +283,19 @@ class _StatisticState extends State<StatisticIncome>
                                       controller: ScrollController(),
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
-                                        final incomeList = income[index];
+                                        final incomeList = filteredList[index];
                                         final accessKey =
-                                            getKey(list, incomeList.name!);
+                                            getKey(list, incomeList.key!);
                                         String formattedDate =
                                             DateFormat('dd-MM-yyyy')
                                                 .format(incomeList.date!);
-                                        return ListTile(
+                                        return GestureDetector(
                                           onLongPress: () => alertDialog(
                                               incomeList.key, context),
                                           onTap: () {
                                             Navigator.pushNamed(
-                                                context, '/details',
+                                                context, '/editscreen',
                                                 arguments: {
-                                                  "purpose": incomeList.name,
                                                   "date": incomeList.date,
                                                   "category":
                                                       incomeList.category,
@@ -251,29 +305,68 @@ class _StatisticState extends State<StatisticIncome>
                                                   "type": incomeList.type
                                                 });
                                           },
-                                          leading: Container(
-                                            alignment: Alignment.center,
-                                            height: mediaQuery(context, 0.05),
-                                            width:
-                                                mediaQueryWidth(context, 0.12),
-                                            decoration:
-                                                roundedConrnerTwo(themeColor),
-                                            child: Text(
-                                              "INC",
-                                              style: boldText(17),
+                                          child: Card(
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            shadowColor: Colors.grey[350],
+                                            child: Column(
+                                              children: [
+                                                ListTile(
+                                                  leading: Container(
+                                                    alignment: Alignment.center,
+                                                    height: mediaQuery(
+                                                        context, 0.05),
+                                                    width: mediaQueryWidth(
+                                                        context, 0.12),
+                                                    decoration:
+                                                        roundedConrnerTwo(
+                                                            themeColor),
+                                                    child: Text(
+                                                      incomeList.type ==
+                                                              CategoryType
+                                                                  .income
+                                                          ? "INC"
+                                                          : "EXP",
+                                                      style: boldText(17),
+                                                    ),
+                                                  ),
+                                                  title: Text(incomeList
+                                                      .category!.category!),
+                                                  subtitle: Text(formattedDate),
+                                                  trailing: Text(
+                                                    "₹${incomeList.amount}",
+                                                    style: boldText(21),
+                                                  ),
+                                                ),
+                                                const Divider(),
+                                                detailsView(
+                                                    15,
+                                                    'Category :',
+                                                    incomeList
+                                                        .category!.category!),
+                                                SizedBox(
+                                                  height:
+                                                      mediaQuery(context, 0.01),
+                                                ),
+                                                detailsView(16, 'Notes :',
+                                                    incomeList.notes!),
+                                                SizedBox(
+                                                  height:
+                                                      mediaQuery(context, 0.02),
+                                                )
+                                              ],
                                             ),
-                                          ),
-                                          title: Text(incomeList.name!),
-                                          subtitle: Text(formattedDate),
-                                          trailing: Text(
-                                            "₹ ${incomeList.amount}",
-                                            style: boldText(25),
                                           ),
                                         );
                                       },
                                       separatorBuilder: (context, index) =>
-                                          const Divider(),
-                                      itemCount: income.length);
+                                          Container(
+                                            height: mediaQuery(context, 0.01),
+                                            width: double.infinity,
+                                            color: const Color.fromARGB(
+                                                255, 255, 238, 238),
+                                          ),
+                                      itemCount: filteredList.length);
                                 }
                               }),
                         )
@@ -301,15 +394,6 @@ class _StatisticState extends State<StatisticIncome>
     ontap.value = _dateController.index;
   }
 
-  date(String format, DatePickerMode modeof) async {
-    var formattedDate = await datePicker(context, format);
-    setState(() {
-      day = formattedDate;
-    });
-
-    // print(placedAt);
-  }
-
   alertDialog(int key, BuildContext context) {
     showDialog<String>(
       context: context,
@@ -326,7 +410,7 @@ class _StatisticState extends State<StatisticIncome>
             onPressed: () {
               db_trans.deleteTransaction(key);
               Navigator.pop(context, 'OK');
-              setState(() {});
+              // setState(() {});
             },
             child: const Text('OK'),
           ),

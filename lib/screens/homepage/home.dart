@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
-
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/main.dart';
+import 'package:money_land/screens/add_page/assest/widgets.dart';
 import 'package:money_land/screens/homepage/assest/functions.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/homepage/assest/widgets.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
-import '../statistic_page/assests/functions.dart';
+import '../../global/functions/functions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,16 +22,21 @@ class HomePage extends StatefulWidget {
 
 DateTime now = DateTime.now();
 String formattedDate = DateFormat(' EEE d MMM').format(now);
+final initialDate = DateTimeRange(
+    start: DateTime.now(), end: DateTime.now().add(const Duration(days: 3)));
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
-  late TabController _date_in_home;
+  late TabController _datecontrollr;
 
   @override
   void initState() {
-    _date_in_home = TabController(length: 4, vsync: this);
-    _date_in_home.addListener(settings);
+    _datecontrollr = TabController(length: 4, vsync: this, initialIndex: 1);
+    _datecontrollr.addListener(settings);
+
     super.initState();
+    rangeTextStart = formatPeriodStart(range);
+    rangeTextEnd = formatPeriodEnd(range);
   }
 
   bool visbleOf() {
@@ -48,6 +53,12 @@ class _HomePageState extends State<HomePage>
 
   num? totalExp;
   double? totalIncome;
+  DateTime dateInRange = now;
+  String? dateInRangeFormated;
+  DateTimeRange? rangeOfPeriod;
+  DateTimeRange range = initialDate;
+  late String rangeTextStart;
+  late String rangeTextEnd;
 
   // ValueNotifier<bool> visible = ValueNotifier(fa);
 
@@ -55,11 +66,19 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     List<AddTransaction> transaction =
         Hive.box<AddTransaction>(db_transaction).values.toList();
+    dateInRangeFormated = formatted();
 
-    totalExp = totalTransaction(transaction, CategoryType.expense);
-    totalIncome = totalTransaction(transaction, CategoryType.income);
+    final filteredList = gotoFilter(
+        range: dateInRange,
+        controller: _datecontrollr,
+        list: transaction,
+        dateTimeRange: range);
+
+    totalExp = totalTransaction(filteredList, CategoryType.expense);
+    totalIncome = totalTransaction(filteredList, CategoryType.income);
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 251, 245, 245),
       appBar: AppBar(
         shadowColor: Colors.transparent,
         centerTitle: true,
@@ -76,7 +95,7 @@ class _HomePageState extends State<HomePage>
                 Icons.calendar_month_outlined,
                 color: themeColor,
               ),
-              onPressed: () => showDate(context, _date_in_home),
+              onPressed: () => showDate(context, _datecontrollr),
             ),
           )
         ],
@@ -86,7 +105,7 @@ class _HomePageState extends State<HomePage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              child: _date_in_home.index <= 2
+              child: _datecontrollr.index <= 2
                   ? Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -94,24 +113,31 @@ class _HomePageState extends State<HomePage>
                           spacing: 0.01,
                           children: [
                             IconButton(
-                                onPressed: null,
+                                onPressed: () {
+                                  dateInRange = decreseingDate(
+                                      _datecontrollr, dateInRange);
+                                  setState(() {});
+                                },
                                 icon: iconOf(Icons.arrow_back_ios)),
                             // ignore: avoid_unnecessary_containers
                             Container(
                               alignment: Alignment.center,
                               child: TextButton(
-                                  onPressed: () => datePicker(),
+                                  onPressed: () async {
+                                    dateInRange = await datePicker();
+                                    setState(() {});
+                                  },
                                   child: Text(
-                                    _date_in_home.index == 0
-                                        ? formattedDate
-                                        : _date_in_home.index == 1
-                                            ? 'April'
-                                            : '2022',
+                                    dateInRangeFormated!,
                                     style: const TextStyle(color: Colors.black),
                                   )),
                             ),
                             IconButton(
-                                onPressed: null,
+                                onPressed: () {
+                                  dateInRange = increasingDate(
+                                      _datecontrollr, dateInRange);
+                                  setState(() {});
+                                },
                                 icon: iconOf(
                                   Icons.arrow_forward_ios,
                                 ))
@@ -123,11 +149,11 @@ class _HomePageState extends State<HomePage>
                       padding: const EdgeInsets.only(left: 20, top: 12),
                       child: Row(
                         children: [
-                          datePickerOfHome(formattedDate, context),
+                          datePickerOfHome(0, context, rangeOfPeriod),
                           SizedBox(
                             width: mediaQueryWidth(context, 0.02),
                           ),
-                          datePickerOfHome(formattedDate, context)
+                          datePickerOfHome(1, context, rangeOfPeriod)
                         ],
                       ),
                     ),
@@ -152,7 +178,9 @@ class _HomePageState extends State<HomePage>
                         height: mediaQuery(context, 0.24),
                         width: double.infinity,
                         child: Text(
-                          '₹${totalIncome! - totalExp!}',
+                          totalIncome! > totalExp!
+                              ? '₹${totalIncome! - totalExp!}'
+                              : "₹ 0.00",
                           style: const TextStyle(
                               fontSize: 65, fontWeight: FontWeight.bold),
                         ),
@@ -169,9 +197,10 @@ class _HomePageState extends State<HomePage>
                               bottomRight: Radius.circular(10)),
                           color: themeColor,
                         ),
-                        child: const Text(
-                          "Current Balance",
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                        child: Text(
+                          dateInRange == now ? "Current Balance" : "Balance",
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.white),
                         ),
                       )
                     ],
@@ -209,13 +238,21 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
             ),
+            sizedBox(context),
             ValueListenableBuilder(
                 valueListenable:
                     Hive.box<AddTransaction>(db_transaction).listenable(),
                 builder: (context, Box<AddTransaction> box, _) {
                   final listBox = box.values.toList();
-                  transaction = listBox;
-                  if (listBox.isEmpty) {
+                  final List<AddTransaction> listOf = gotoFilter(
+                      controller: _datecontrollr,
+                      range: dateInRange,
+                      list: listBox,
+                      dateTimeRange: range);
+
+                  // transaction.value = filteredBox;
+
+                  if (listOf.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 60),
                       child: Center(
@@ -241,54 +278,78 @@ class _HomePageState extends State<HomePage>
                       ),
                     );
                   } else {
-                    return ListView.builder(
+                    return ListView.separated(
                         controller: ScrollController(),
                         shrinkWrap: true,
+                        reverse: true,
                         itemBuilder: (context, index) {
-                          final list = listBox[(listBox.length - 1) - index];
-                          final int? accesKey = getKey(listBox, list.name!);
+                          final list = listOf[index];
+                          // final int? accesKey = getKey(listBox, list.key!);
 
                           String formattedDate =
                               DateFormat("dd-MM-yyyy").format(list.date!);
-                          return Card(
-                            shadowColor: Colors.grey[350],
-                            child: ListTile(
-                              onLongPress: () => alertDialog(list.key, context),
-                              onTap: () {
-                                Navigator.pushNamed(context, '/details',
-                                    arguments: {
-                                      "purpose": list.name,
-                                      "date": list.date,
-                                      "category": list.category,
-                                      "amount": list.amount,
-                                      "notes": list.notes,
-                                      "key": accesKey,
-                                      "type": list.type
-                                    });
-                              },
-                              leading: Container(
-                                alignment: Alignment.center,
-                                height: mediaQuery(context, 0.05),
-                                width: mediaQueryWidth(context, 0.12),
-                                decoration: roundedConrnerTwo(themeColor),
-                                child: Text(
-                                  list.type == CategoryType.income
-                                      ? "INC"
-                                      : "EXP",
-                                  style: boldText(17),
-                                ),
-                              ),
-                              title: Text(list.name!),
-                              subtitle: Text(formattedDate),
-                              trailing: Text(
-                                "₹${list.amount}",
-                                style: boldText(21),
+                          return GestureDetector(
+                            onLongPress: () => alertDialog(list.key, context),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/editscreen',
+                                arguments: {
+                                  "date": list.date,
+                                  "category": list.category,
+                                  "amount": list.amount,
+                                  "notes": list.notes,
+                                  "key": list.key,
+                                  "type": list.type,
+                                },
+                              );
+                            },
+                            child: Card(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 11),
+                              shadowColor: Colors.grey[350],
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    leading: Container(
+                                      alignment: Alignment.center,
+                                      height: mediaQuery(context, 0.05),
+                                      width: mediaQueryWidth(context, 0.12),
+                                      decoration: roundedConrnerTwo(themeColor),
+                                      child: Text(
+                                        list.type == CategoryType.income
+                                            ? "INC"
+                                            : "EXP",
+                                        style: boldText(17),
+                                      ),
+                                    ),
+                                    title: Text(list.category!.category!),
+                                    subtitle: Text(formattedDate),
+                                    trailing: Text(
+                                      "₹${list.amount}",
+                                      style: boldText(21),
+                                    ),
+                                  ),
+                                  const Divider(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child:
+                                        detailsView(16, 'Notes :', list.notes!),
+                                  ),
+                                  SizedBox(
+                                    height: mediaQuery(context, 0.02),
+                                  )
+                                ],
                               ),
                             ),
                           );
                         },
-                        // separatorBuilder: (context, index) => const Divider(),
-                        itemCount: listBox.length);
+                        separatorBuilder: (context, index) => Container(
+                              height: mediaQuery(context, 0.01),
+                              width: double.infinity,
+                              color: const Color.fromARGB(255, 251, 245, 245),
+                            ),
+                        itemCount: listOf.length);
                   }
                 })
           ],
@@ -311,10 +372,9 @@ class _HomePageState extends State<HomePage>
           ),
           TextButton(
             onPressed: () {
-              setState(() {
-                db_trans.deleteTransaction(key);
-                Navigator.pop(context, 'OK');
-              });
+              db_trans.deleteTransaction(key);
+              Navigator.pop(context, 'OK');
+              setState(() {});
             },
             child: const Text('OK'),
           ),
@@ -323,7 +383,7 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Future<String> datePicker() async {
+  Future<DateTime> datePicker() async {
     DateTime? date;
 
     date = await showDatePicker(
@@ -334,14 +394,47 @@ class _HomePageState extends State<HomePage>
         firstDate: DateTime(now.year - 5),
         lastDate: DateTime(now.year + 5));
     if (date != null) {
-      String formattedDate = DateFormat("dd-MM-yyyy").format(date);
-      setState(() {
-        final initialDate = date;
-      });
-
-      return formattedDate;
+      return date;
     } else {
-      return formattedDate;
+      return now;
     }
+  }
+
+  String? formatted() {
+    String? formattedOf;
+    if (_datecontrollr.index == 0) {
+      formattedOf = DateFormat('dd MMM yy').format(dateInRange);
+    } else if (_datecontrollr.index == 1) {
+      formattedOf = DateFormat('MMMM yyyy').format(dateInRange);
+    } else {
+      formattedOf = DateFormat('yyyy').format(dateInRange);
+    }
+    return formattedOf;
+  }
+
+  Widget datePickerOfHome(
+      int type, BuildContext context, DateTimeRange? dateTimeRange) {
+    return InkWell(
+      onTap: () async {
+        range = await dateRangePicker(context, dateTimeRange);
+
+        setState(() {});
+        rangeTextStart = formatPeriodStart(range);
+        rangeTextEnd = formatPeriodEnd(range);
+      },
+      child: Container(
+        alignment: Alignment.center,
+        height: mediaQuery(context, 0.03),
+        width: mediaQueryWidth(context, 0.20),
+        decoration: roundedConrnerHome(lightColor),
+        child: Text(
+          type == 0 ? rangeTextStart : rangeTextEnd,
+          style: const TextStyle(
+            color: Colors.black,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 }

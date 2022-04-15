@@ -6,8 +6,6 @@ import 'package:money_land/main.dart';
 import 'package:money_land/screens/category_page/assest/functions.dart';
 
 import '../../../database/database_crud/db_crud_categories.dart';
-import '../../../global/styles.dart';
-import '../../../themes/mediaquery/mediaquery.dart';
 
 class Income extends StatefulWidget {
   const Income({Key? key}) : super(key: key);
@@ -95,15 +93,18 @@ class _IncomeState extends State<Income> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text(' Delete'),
-        content: const Text('Are you sure'),
+        title: const Text(' Are you sure'),
+        content: const Text(
+            'All the transaction from the above category will be deleted '),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
+              final deleteTrans = await db_trans.getTrasaction();
+              categorySelector(deleteTrans, delete);
               db_Categories.deleteCategory(delete.key);
               Navigator.pop(context);
             },

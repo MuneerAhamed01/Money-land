@@ -6,6 +6,7 @@ import 'package:money_land/themes/routes/routes.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_land/database/database_crud/db_crud_categories.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 
 final db_trans = TransactionDB();
 final db_Categories = CategoryDB();
@@ -35,11 +36,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        MonthYearPickerLocalizations.delegate,
+      ],
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         errorColor: Colors.grey,
-        canvasColor: Colors.transparent,
-        scaffoldBackgroundColor: Colors.white,
+        // canvasColor: Colors.transparent,
+        // scaffoldBackgroundColor: Colors.white,
       ),
       onGenerateRoute: RouteGenerator.generateRoute,
     );

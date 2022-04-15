@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:money_land/global/functions/functions.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
+import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
 import '../../../themes/colors/colors.dart';
@@ -47,26 +49,26 @@ Icon iconOf(IconData data) {
   );
 }
 
-Widget datePickerOfHome(String type, BuildContext context) {
-  return Container(
-    alignment: Alignment.center,
-    height: mediaQuery(context, 0.03),
-    width: mediaQueryWidth(context, 0.20),
-    decoration: roundedConrnerHome(lightColor),
-    child: Text(
-      type,
-      style: const TextStyle(
-        color: Colors.white,
-      ),
-      textAlign: TextAlign.center,
-    ),
-  );
-}
-
 BoxDecoration roundedConrnerHome(Color color) {
   return BoxDecoration(
     border: Border.all(color: themeColor),
     borderRadius: BorderRadius.circular(5),
     color: color,
+  );
+}
+
+Widget detailsView(double padding, String heading, String listOf) {
+  return Padding(
+    padding: EdgeInsets.symmetric(horizontal: padding),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          heading,
+          style: const TextStyle(color: Colors.grey),
+        ),
+        Text(listOf)
+      ],
+    ),
   );
 }

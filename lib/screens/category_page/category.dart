@@ -64,9 +64,7 @@ class _CategoryState extends State<Category>
         floatingActionButton: _tabcontroller.index == 0
             ? FloatingActionButton(
                 backgroundColor: themeColor,
-                onPressed: () async {
-                  final show = await db_trans.getTrasaction();
-                  // print(show[0].amount);
+                onPressed: () {
                   bottomSheet(context, "ADD Income", _tabcontroller.index,
                       Creating.adding, CategoryType.income);
                   // addPage(box);

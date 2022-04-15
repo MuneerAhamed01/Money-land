@@ -30,9 +30,12 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
+  flutter_slidable: ^1.2.0
   flutter_svg: ^1.0.3
   hive_flutter: ^1.1.0
   intl: ^0.17.0
+  month_picker_dialog: ^0.4.0
+  month_year_picker: ^0.1.0+1
   shared_preferences: ^2.0.13
   syncfusion_flutter_charts: ^19.4.56
 
@@ -44,6 +47,8 @@ dev_dependencies:
   hive_generator: ^1.1.2
   path_provider: ^2.0.9
   animated_text_kit: ^4.2.1
+  
+  
 
 
 # For information on the generic Dart part of this file, see the

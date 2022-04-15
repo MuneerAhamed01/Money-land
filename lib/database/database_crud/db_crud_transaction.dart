@@ -8,7 +8,6 @@ class TransactionDB {
     final dbOpen = Hive.box<AddTransaction>(db_transaction);
 
     await dbOpen.add(value);
-    
   }
 
   Future<List<AddTransaction>> getTrasaction() async {
@@ -16,16 +15,13 @@ class TransactionDB {
     return dbOpen.values.toList();
   }
 
- 
-
   deleteTransaction(int key) {
     Hive.box<AddTransaction>(db_transaction).delete(key);
   }
 
   updateTransaction(int index, AddTransaction value) {
     final dbOpen = Hive.box<AddTransaction>(db_transaction);
-    dbOpen.putAt(index, value);
-  
+    dbOpen.put(index, value);
   }
 
   clearTransactionHive() {

@@ -4,15 +4,15 @@ import 'package:intl/intl.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/main.dart';
-
 import 'package:money_land/screens/homepage/assest/styles.dart';
-
+import 'package:money_land/screens/homepage/home.dart';
 import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
+import '../../global/functions/functions.dart';
 import '../homepage/assest/functions.dart';
+import '../homepage/assest/widgets.dart';
 import 'assests/widgets.dart';
 
 class Statistic extends StatefulWidget {
@@ -22,6 +22,9 @@ class Statistic extends StatefulWidget {
   State<Statistic> createState() => _StatisticState();
 }
 
+final initialDate = DateTimeRange(
+    start: DateTime.now(), end: DateTime.now().add(const Duration(days: 3)));
+
 class _StatisticState extends State<Statistic>
     with SingleTickerProviderStateMixin {
   late TabController _dateController;
@@ -30,12 +33,13 @@ class _StatisticState extends State<Statistic>
   @override
   void initState() {
     chartsof = chartView();
-    _dateController = TabController(length: 4, vsync: this, initialIndex: 0);
+    _dateController = TabController(length: 4, vsync: this, initialIndex: 1);
     _dateController.addListener(Setting);
 
     super.initState();
   }
 
+  // ignore: non_constant_identifier_names
   Setting() {
     setState(() {});
   }
@@ -44,12 +48,36 @@ class _StatisticState extends State<Statistic>
   String day = "01";
   String month = 'month';
   String year = "year";
-  List<AddTransaction> transaction =
-      Hive.box<AddTransaction>(db_transaction).values.toList();
+
+  DateTime monthPicker = DateTime.now();
+
+  String? formattedMonth;
+  String? formattedYear;
+  String? formateDay;
+  DateTimeRange range = initialDate;
+  String? rangeTextStart;
+  String? rangeTextEnd;
 
   @override
   Widget build(BuildContext context) {
-    final double totalExp = totalTransaction(transaction, CategoryType.expense);
+    List<AddTransaction> transaction =
+        Hive.box<AddTransaction>(db_transaction).values.toList();
+
+    final List<AddTransaction> filteredList = gotoFilter(
+        range: monthPicker,
+        controller: _dateController,
+        list: transaction,
+        dateTimeRange: range);
+
+    formattedMonth = DateFormat('MMM').format(monthPicker);
+    formateDay = DateFormat('dd-MM-yy').format(monthPicker);
+    formattedYear = DateFormat('yyyy').format(monthPicker);
+
+    rangeTextStart = DateFormat('dd-MM-yy').format(range.start);
+    rangeTextEnd = DateFormat('dd-MM-yy').format(range.end);
+
+    final double totalExp =
+        totalTransaction(filteredList, CategoryType.expense);
 
     return SafeArea(
       child: ScrollConfiguration(
@@ -100,14 +128,16 @@ class _StatisticState extends State<Statistic>
                             position: LegendPosition.bottom,
                           ),
                           series: <CircularSeries>[
-                            DoughnutSeries<Datas, String>(
+                            DoughnutSeries<AddTransaction, String>(
                               dataLabelSettings: const DataLabelSettings(
                                   isVisible: true,
                                   labelPosition:
                                       ChartDataLabelPosition.outside),
-                              dataSource: chartsof,
-                              xValueMapper: (Datas data, _) => data.category,
-                              yValueMapper: (Datas data, _) => data.amount,
+                              dataSource: filteredList,
+                              xValueMapper: (AddTransaction data, _) =>
+                                  data.category!.category,
+                              yValueMapper: (AddTransaction data, _) =>
+                                  data.amount,
                             )
                           ],
                         ),
@@ -138,53 +168,80 @@ class _StatisticState extends State<Statistic>
                               Container(
                                   child: _dateController.index == 0
                                       ? InkWell(
-                                          onTap: () => datePicker(
-                                                context,
-                                                'dd',
-                                              ),
-                                          child: datePickerOf("Day", context))
+                                          onTap: () async {
+                                            monthPicker = await datePicker(
+                                                context, 'dd', monthPicker);
+
+                                            setState(() {});
+                                          },
+                                          child: datePickerOf(
+                                              formateDay ?? "Day", context))
                                       : _dateController.index == 1
                                           ? InkWell(
-                                              onTap: () =>
-                                                  datePicker(context, "MM"),
+                                              onTap: () async {
+                                                monthPicker =
+                                                    await datePickerNew(
+                                                        context,
+                                                        _dateController,
+                                                        monthPicker);
+                                                setState(() {});
+                                              },
                                               child: datePickerOf(
-                                                  'Month', context))
+                                                  formattedMonth ?? 'Month',
+                                                  context))
                                           : _dateController.index == 2
                                               ? InkWell(
-                                                  onTap: () => datePicker(
-                                                      context, "year"),
+                                                  onTap: () async {
+                                                    monthPicker =
+                                                        await datePickerNew(
+                                                            context,
+                                                            _dateController,
+                                                            monthPicker);
+                                                    setState(() {});
+                                                  },
                                                   child: datePickerOf(
-                                                      'year', context))
+                                                      formattedYear ?? "Year",
+                                                      context))
                                               : Row(
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: [
                                                     InkWell(
-                                                        onTap: () => datePicker(
-                                                            context, "yyyy"),
+                                                        onTap: () async {
+                                                          range =
+                                                              await dateRangePicker(
+                                                                  context,
+                                                                  range);
+                                                          setState(() {});
+                                                        },
                                                         child: datePickerOf(
-                                                            "day", context)),
+                                                            rangeTextStart ??
+                                                                "From",
+                                                            context)),
                                                     SizedBox(
                                                       width: mediaQueryWidth(
                                                           context, 0.01),
                                                     ),
                                                     InkWell(
-                                                        onTap: () => datePicker(
-                                                            context, "yyyy"),
+                                                        onTap: () async {
+                                                          range =
+                                                              await dateRangePicker(
+                                                                  context,
+                                                                  range);
+                                                          setState(() {});
+                                                        },
                                                         child: datePickerOf(
-                                                            "type", context))
+                                                            rangeTextEnd ??
+                                                                "To",
+                                                            context))
                                                   ],
                                                 ))
                             ],
                           ),
                         ),
-                        const Padding(
-                          padding:
-                              EdgeInsets.only(top: 10, left: 20, right: 20),
-                          child: Divider(),
-                        ),
+                        const Divider(),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: const EdgeInsets.only(top: 5),
                           child: ValueListenableBuilder(
                               valueListenable:
                                   Hive.box<AddTransaction>(db_transaction)
@@ -196,7 +253,13 @@ class _StatisticState extends State<Statistic>
                                     splitTransaction(
                                         list, CategoryType.expense);
 
-                                if (expense.isEmpty) {
+                                final filteredList = gotoFilter(
+                                    controller: _dateController,
+                                    dateTimeRange: range,
+                                    list: expense,
+                                    range: monthPicker);
+
+                                if (filteredList.isEmpty) {
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 60),
                                     child: Center(
@@ -230,52 +293,90 @@ class _StatisticState extends State<Statistic>
                                       controller: ScrollController(),
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
-                                        final expenseList = expense[index];
+                                        final expenseList = filteredList[index];
                                         String formattedDate =
                                             DateFormat('dd-MM-yyyy')
                                                 .format(expenseList.date!);
                                         final accessKey =
-                                            getKey(list, expenseList.name!);
-                                        return ListTile(
+                                            getKey(list, expenseList.key!);
+                                        return GestureDetector(
                                           onLongPress: () => alertDialog(
                                               expenseList.key, context),
                                           onTap: () {
                                             Navigator.pushNamed(
-                                                context, '/details',
+                                                context, '/editscreen',
                                                 arguments: {
-                                                  "purpose": expenseList.name,
                                                   "date": expenseList.date,
                                                   "category":
                                                       expenseList.category,
-                                                  "amount": expenseList,
+                                                  "amount": expenseList.amount,
                                                   "notes": expenseList.notes,
                                                   "key": accessKey,
                                                   "type": expenseList.type
                                                 });
                                           },
-                                          leading: Container(
-                                            alignment: Alignment.center,
-                                            height: mediaQuery(context, 0.05),
-                                            width:
-                                                mediaQueryWidth(context, 0.12),
-                                            decoration:
-                                                roundedConrnerTwo(themeColor),
-                                            child: Text(
-                                              "EXP",
-                                              style: boldText(17),
+                                          child: Card(
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            shadowColor: Colors.grey[350],
+                                            child: Column(
+                                              children: [
+                                                ListTile(
+                                                  leading: Container(
+                                                    alignment: Alignment.center,
+                                                    height: mediaQuery(
+                                                        context, 0.05),
+                                                    width: mediaQueryWidth(
+                                                        context, 0.12),
+                                                    decoration:
+                                                        roundedConrnerTwo(
+                                                            themeColor),
+                                                    child: Text(
+                                                      expenseList.type ==
+                                                              CategoryType
+                                                                  .income
+                                                          ? "INC"
+                                                          : "EXP",
+                                                      style: boldText(17),
+                                                    ),
+                                                  ),
+                                                  title: Text(expenseList
+                                                      .category!.category!),
+                                                  subtitle: Text(formattedDate),
+                                                  trailing: Text(
+                                                    "₹${expenseList.amount}",
+                                                    style: boldText(21),
+                                                  ),
+                                                ),
+                                                const Divider(),
+                                                detailsView(
+                                                    15,
+                                                    'Category :',
+                                                    expenseList
+                                                        .category!.category!),
+                                                SizedBox(
+                                                  height:
+                                                      mediaQuery(context, 0.01),
+                                                ),
+                                                detailsView(16, 'Notes :',
+                                                    expenseList.notes!),
+                                                SizedBox(
+                                                  height:
+                                                      mediaQuery(context, 0.02),
+                                                )
+                                              ],
                                             ),
-                                          ),
-                                          title: Text(expenseList.name!),
-                                          subtitle: Text(formattedDate),
-                                          trailing: Text(
-                                            "₹ ${expenseList.amount}",
-                                            style: boldText(25),
                                           ),
                                         );
                                       },
                                       separatorBuilder: (context, index) =>
-                                          const Divider(),
-                                      itemCount: expense.length);
+                                          Container(
+                                            height: mediaQuery(context, 0.01),
+                                            width: double.infinity,
+                                            color: const Color.fromARGB(
+                                                255, 251, 245, 245),
+                                          ),
+                                      itemCount: filteredList.length);
                                 }
                               }),
                         )

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -72,7 +74,7 @@ class _ExpenseState extends State<Expense> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.edit),
-                                onPressed: () {
+                                onPressed: () async {
                                   final int? ind =
                                       dbConnect(exp[index].category);
                                   bottomSheet(context, "Edit Expense", ind!,
@@ -101,16 +103,21 @@ class _ExpenseState extends State<Expense> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text(' Delete'),
-        content: const Text('Are you sure'),
+        title: const Text(' Are  you sure'),
+        content: const Text(
+            'All the transaction from the above category will be deleted'),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
+              final deleteTransaction = await db_trans.getTrasaction();
+
+              categorySelector(deleteTransaction, delete);
               db_Categories.deleteCategory(delete.key);
+
               Navigator.pop(context);
             },
             child: const Text('OK'),

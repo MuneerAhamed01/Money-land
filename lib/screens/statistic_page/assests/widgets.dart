@@ -21,7 +21,7 @@ Widget datePickerOf(String type, BuildContext context) {
   return Container(
     alignment: Alignment.center,
     height: mediaQuery(context, 0.03),
-    width: mediaQueryWidth(context, 0.12),
+    width: mediaQueryWidth(context, 0.13),
     decoration: roundedConrnerStaristic(lightColor),
     child: Text(
       type,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-
+import 'package:money_land/database/database_crud/db_crud_categories.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
@@ -28,15 +30,13 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     db_Categories.refreshUI();
-    _tabControl = TabController(
+    if (widget.editValues.isEmpty) {
+      _tabControl = TabController(
         length: 2,
         vsync: this,
-        initialIndex: widget.editValues.isEmpty
-            ? 0
-            : widget.editValues["type"] == CategoryType.expense
-                ? 1
-                : 0);
-    _tabControl.addListener(tabHandler);
+      );
+      _tabControl.addListener(tabHandler);
+    }
 
     super.initState();
   }
@@ -62,9 +62,13 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
   DateTime? initialDate;
   Categories? itemsOf;
   Categories? itemsOn;
+  FocusNode? onFocus;
+  dynamic unfocous;
 
   @override
   Widget build(BuildContext context) {
+    print(widget.editValues['type']);
+    itemsOf = Hive.box<Categories>(db_Name).get(widget.editValues["key"]);
     final Map initialValues = widget.editValues;
     if (_date.text.isEmpty) {
       if (initialValues.isEmpty) {
@@ -77,22 +81,42 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     }
 
     return SafeArea(
+      top: widget.editValues.isEmpty ? true : false,
       child: Scaffold(
+        appBar: widget.editValues.isNotEmpty
+            ? AppBar(
+                iconTheme: const IconThemeData(color: Colors.black),
+                backgroundColor: lightColor,
+                shadowColor: Colors.transparent,
+                title: Text(
+                  widget.editValues["type"] == CategoryType.income
+                      ? "INCOME"
+                      : "EXPENSE",
+                  style: const TextStyle(color: Colors.black),
+                ),
+                centerTitle: true,
+              )
+            : null,
         body: SingleChildScrollView(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(25),
-                child: Container(
-                  color: lightColor,
-                  child: TabBar(
-                    indicator: BoxDecoration(color: themeColor),
-                    labelColor: Colors.black,
-                    tabs: const [Tab(text: 'INCOME'), Tab(text: 'EXPENSE')],
-                    controller: _tabControl,
-                  ),
-                ),
-              ),
+              widget.editValues.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(25),
+                      child: Container(
+                        color: lightColor,
+                        child: TabBar(
+                          indicator: BoxDecoration(color: themeColor),
+                          labelColor: Colors.black,
+                          tabs: const [
+                            Tab(text: 'INCOME'),
+                            Tab(text: 'EXPENSE')
+                          ],
+                          controller: _tabControl,
+                        ),
+                      ),
+                    )
+                  : const Text(""),
               Form(
                   key: keyAdd,
                   child: Padding(
@@ -104,15 +128,16 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           TextFormField(
                             initialValue: initialValues.isEmpty
                                 ? null
-                                : initialValues["purpose"],
+                                : initialValues["amount"].toString(),
+                            keyboardType: TextInputType.number,
                             maxLines: 1,
-                            decoration: dec(
-                                _tabControl.index == 0 ? "Form" : "Purpose"),
+                            decoration: dec("Amount"),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "";
                               } else {
-                                name = value;
+                                final valueInt = double.parse(value);
+                                amount = valueInt;
                                 return null;
                               }
                             },
@@ -137,69 +162,89 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           ),
                           sizedBox(context),
                           SizedBox(
-                            width: double.infinity,
-                            child: ValueListenableBuilder(
-                                valueListenable: _tabControl.index == 0
-                                    ? db_Categories.income
-                                    : db_Categories.expense,
-                                builder: (context,
-                                    List<Categories> categoryDowm, _) {
-                                  return DropdownButtonFormField<Categories>(
-                                    value: _tabControl.index == 0
-                                        ? itemsOf
-                                        : itemsOn,
-                                    hint: const Text("Select Category"),
-                                    dropdownColor: Colors.white,
-                                    decoration: dec(""),
-                                    items: categoryDowm
-                                        .map((Categories item) =>
-                                            DropdownMenuItem<Categories>(
-                                              value: item,
-                                              child: Text(item.category!),
-                                            ))
-                                        .toList(),
-                                    onChanged: (item) {
-                                      if (_tabControl.index == 0) {
-                                        setState(() {
-                                          itemsOf = item!;
-                                        });
-                                      } else {
-                                        setState(() {
-                                          itemsOn = item!;
-                                        });
-                                      }
-                                    },
-                                    isExpanded: true,
-                                    validator: (value) {
-                                      if (value == null ||
-                                          value.category!.isEmpty) {
-                                        return '';
-                                      } else {
-                                        categoryOf = value;
-                                        return null;
-                                      }
-                                    },
-                                  );
-                                }),
-                          ),
-                          sizedBox(context),
-                          TextFormField(
-                            initialValue: initialValues.isEmpty
-                                ? null
-                                : initialValues["amount"].toString(),
-                            keyboardType: TextInputType.number,
-                            maxLines: 1,
-                            decoration: dec("Amount"),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "";
-                              } else {
-                                final valueInt = double.parse(value);
-                                amount = valueInt;
-                                return null;
-                              }
-                            },
-                          ),
+                              width: double.infinity,
+                              child: widget.editValues.isEmpty
+                                  ? ValueListenableBuilder(
+                                      valueListenable: _tabControl.index == 0
+                                          ? db_Categories.income
+                                          : db_Categories.expense,
+                                      builder: (context,
+                                          List<Categories> categoryDowm, _) {
+                                        return DropdownButtonFormField<
+                                            Categories>(
+                                          value: _tabControl.index == 0
+                                              ? itemsOf
+                                              : itemsOn,
+                                          hint: const Text("Select Category"),
+                                          dropdownColor: Colors.white,
+                                          decoration: dec(""),
+                                          items: categoryDowm
+                                              .map((Categories item) =>
+                                                  DropdownMenuItem<Categories>(
+                                                    value: item,
+                                                    child: Text(item.category!),
+                                                  ))
+                                              .toList(),
+                                          onChanged: (item) {
+                                            if (_tabControl.index == 0) {
+                                              setState(() {
+                                                itemsOf = item!;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                itemsOn = item!;
+                                              });
+                                            }
+                                          },
+                                          isExpanded: true,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.category!.isEmpty) {
+                                              return '';
+                                            } else {
+                                              categoryOf = value;
+                                              return null;
+                                            }
+                                          },
+                                        );
+                                      })
+                                  : ValueListenableBuilder(
+                                      valueListenable: initialValues["type"] ==
+                                              CategoryType.expense
+                                          ? db_Categories.expense
+                                          : db_Categories.income,
+                                      builder: (context,
+                                          List<Categories> categoryDowm, _) {
+                                        return DropdownButtonFormField<
+                                            Categories>(
+                                          hint: const Text("Select Category"),
+                                          value: itemsOf,
+                                          dropdownColor: Colors.white,
+                                          decoration: dec(""),
+                                          items: categoryDowm
+                                              .map((Categories item) =>
+                                                  DropdownMenuItem<Categories>(
+                                                    value: item,
+                                                    child: Text(item.category!),
+                                                  ))
+                                              .toList(),
+                                          onChanged: (item) {
+                                            setState(() {
+                                              itemsOf = item!;
+                                            });
+                                          },
+                                          isExpanded: true,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.category!.isEmpty) {
+                                              return '';
+                                            } else {
+                                              categoryOf = value;
+                                              return null;
+                                            }
+                                          },
+                                        );
+                                      })),
                           sizedBox(context),
                           TextFormField(
                               initialValue: initialValues.isEmpty
@@ -221,6 +266,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                             height: mediaQuery(context, 0.06),
                             child: ElevatedButton(
                               onPressed: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
                                 gotoAdd();
                               },
                               child: Text("Save", style: styleText),
@@ -282,7 +328,6 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                 if (widget.editValues.isEmpty) {
                   if (_tabControl.index == 0) {
                     db_trans.addTransactions(AddTransaction(
-                        name: name,
                         date: initialDate ?? now,
                         category: categoryOf,
                         amount: amount,
@@ -290,7 +335,6 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                         type: CategoryType.income));
                   } else {
                     db_trans.addTransactions(AddTransaction(
-                        name: name,
                         date: initialDate ?? now,
                         category: categoryOf,
                         amount: amount,
@@ -298,30 +342,17 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                         type: CategoryType.expense));
                   }
                 } else {
-                  if (_tabControl.index == 0) {
-                    db_trans.updateTransaction(
-                        widget.editValues["key"],
-                        AddTransaction(
-                            name: name,
-                            date: initialDate ?? now,
-                            category: categoryOf,
-                            amount: amount,
-                            notes: notes,
-                            type: CategoryType.income));
-                  } else {
-                    db_trans.updateTransaction(
-                        widget.editValues["key"],
-                        AddTransaction(
-                            name: name,
-                            date: initialDate ?? widget.editValues["date"],
-                            category: categoryOf,
-                            amount: amount,
-                            notes: notes,
-                            type: CategoryType.expense));
-                  }
+                  db_trans.updateTransaction(
+                      widget.editValues["key"],
+                      AddTransaction(
+                          date: initialDate ?? now,
+                          category: categoryOf,
+                          amount: amount,
+                          notes: notes,
+                          type: widget.editValues["type"]));
                 }
                 Navigator.pop(ctx);
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pop(context);
               },
               child: const Text('OK'),
             ),
