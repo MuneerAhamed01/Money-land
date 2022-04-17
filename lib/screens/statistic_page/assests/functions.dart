@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
-
 import '../../../database/moneyland_model_class.dart';
-import '../../../main.dart';
 
 DateTime now = DateTime.now();
 Future<DateTime> datePicker(
@@ -61,4 +58,37 @@ Future<DateTime> datePickerNew(
   } else {
     return now;
   }
+}
+
+List<Data> chartViewList(List<AddTransaction> list) {
+  double amount;
+  String? category;
+  List visited = [];
+
+  List<Data> seperateCategory = [];
+  for (var i = 0; i < list.length; i++) {
+    visited.add(0);
+  }
+
+  for (var i = 0; i < list.length; i++) {
+    amount = list[i].amount!;
+    category = list[i].category!.category;
+
+    for (var j = i + 1; j < list.length; j++) {
+      if (list[i].category!.category == list[j].category!.category) {
+        amount += list[j].amount!;
+        visited[j] = -1;
+      }
+    }
+    if (visited[i] != -1) {
+      seperateCategory.add(Data(categories: category, amount: amount));
+    }
+  }
+  return seperateCategory;
+}
+
+class Data {
+  String? categories;
+  double? amount;
+  Data({required this.categories, required this.amount});
 }

@@ -7,8 +7,11 @@ import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
+import 'package:money_land/screens/bottom_nav/navbar.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
+
+import '../category_page/assest/functions.dart';
 
 class AddPage extends StatefulWidget {
   final Map editValues;
@@ -62,13 +65,13 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
   DateTime? initialDate;
   Categories? itemsOf;
   Categories? itemsOn;
-  FocusNode? onFocus;
-  dynamic unfocous;
+  Categories? itemIn;
 
   @override
   Widget build(BuildContext context) {
-    print(widget.editValues['type']);
-    itemsOf = Hive.box<Categories>(db_Name).get(widget.editValues["key"]);
+    itemIn =
+        Hive.box<Categories>(db_Name).get(widget.editValues["categoryKey"]);
+
     final Map initialValues = widget.editValues;
     if (_date.text.isEmpty) {
       if (initialValues.isEmpty) {
@@ -123,9 +126,16 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                     padding: const EdgeInsets.all(20),
                     child: SingleChildScrollView(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           TextFormField(
+                            // maxLength: 6,
+
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(6),
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+
                             initialValue: initialValues.isEmpty
                                 ? null
                                 : initialValues["amount"].toString(),
@@ -218,7 +228,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                         return DropdownButtonFormField<
                                             Categories>(
                                           hint: const Text("Select Category"),
-                                          value: itemsOf,
+                                          value: itemIn,
                                           dropdownColor: Colors.white,
                                           decoration: dec(""),
                                           items: categoryDowm
@@ -230,7 +240,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                               .toList(),
                                           onChanged: (item) {
                                             setState(() {
-                                              itemsOf = item!;
+                                              itemIn = item!;
                                             });
                                           },
                                           isExpanded: true,
@@ -246,7 +256,53 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                         );
                                       })),
                           sizedBox(context),
+                          initialValues.isEmpty
+                              ? Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: Row(
+                                    children: [
+                                      const Text("OR"),
+                                      SizedBox(
+                                        height: mediaQuery(context, 0.04),
+                                        child: TextButton(
+                                            onPressed: () {
+                                              // ignore: void_checks
+                                              return bottomSheet(
+                                                  context,
+                                                  _tabControl.index == 0
+                                                      ? "ADD Income"
+                                                      : "ADD Expense",
+                                                  _tabControl.index,
+                                                  Creating.adding,
+                                                  _tabControl.index == 0
+                                                      ? CategoryType.income
+                                                      : CategoryType.expense);
+                                            },
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.add_box_rounded,
+                                                  size: 15,
+                                                  color: Colors.black,
+                                                ),
+                                                SizedBox(
+                                                  width: mediaQueryWidth(
+                                                      context, 0.02),
+                                                ),
+                                                const Text(
+                                                  "Add Category",
+                                                  style: TextStyle(
+                                                      color: Colors.black),
+                                                ),
+                                              ],
+                                            )),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : sizedBox(context),
                           TextFormField(
+                              maxLength: 20,
                               initialValue: initialValues.isEmpty
                                   ? null
                                   : initialValues["notes"],
@@ -263,7 +319,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           sizedBox(context),
                           SizedBox(
                             width: mediaQueryWidth(context, 0.25),
-                            height: mediaQuery(context, 0.06),
+                            height: mediaQuery(context, 0.05),
                             child: ElevatedButton(
                               onPressed: () {
                                 FocusManager.instance.primaryFocus?.unfocus();
@@ -351,8 +407,10 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           notes: notes,
                           type: widget.editValues["type"]));
                 }
-                Navigator.pop(ctx);
-                Navigator.pop(context);
+
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (ctx) => const NavBar()),
+                    (route) => false);
               },
               child: const Text('OK'),
             ),

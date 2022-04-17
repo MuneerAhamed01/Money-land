@@ -75,6 +75,7 @@ class _ExpenseState extends State<Expense> {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () async {
+                                  // gotoEditCategory();
                                   final int? ind =
                                       dbConnect(exp[index].category);
                                   bottomSheet(context, "Edit Expense", ind!,

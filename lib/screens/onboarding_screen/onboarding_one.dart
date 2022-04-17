@@ -12,42 +12,48 @@ class OnBoardingOne extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            "Make your finance\nBetter with us",
-            style: boldText(40),
+          Padding(
+            padding: const EdgeInsets.only(right: 20, bottom: 20),
+            child: Text(
+              "Make your finance\nBetter with us",
+              style: boldText(40),
+            ),
           ),
           SizedBox(height: mediaQuery(context, 0.2)),
-          Stack(
-            alignment: AlignmentDirectional.bottomEnd,
-            clipBehavior: Clip.none,
-            children: [
-              SvgPicture.asset(
-                  "lib/screens/onboarding_screen/assest/images/imageofboard.svg"),
-              Positioned(
-                right: -45,
-                child: SizedBox(
-                  height: mediaQuery(context, 0.08),
-                  width: mediaQueryWidth(context, 0.20),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(primary: themeColor),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, '/onboardingtwo');
-                      },
-                      child: const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Colors.black,
-                        size: 25,
-                      )),
-                ),
-              )
-            ],
+          SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Stack(
+              alignment: AlignmentDirectional.bottomEnd,
+              clipBehavior: Clip.none,
+              children: [
+                SvgPicture.asset(
+                    "lib/screens/onboarding_screen/assest/images/imageofboard.svg"),
+                Positioned(
+                  right: -45,
+                  child: SizedBox(
+                    height: mediaQuery(context, 0.08),
+                    width: mediaQueryWidth(context, 0.20),
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(primary: themeColor),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                              context, '/onboardingtwo');
+                        },
+                        child: const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.black,
+                          size: 25,
+                        )),
+                  ),
+                )
+              ],
+            ),
           ),
         ],
       ),

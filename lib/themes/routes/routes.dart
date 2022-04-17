@@ -13,7 +13,7 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (context) => const Splashscreen());
       case '/onboardingone':
-        return MaterialPageRoute(builder: (context) => OnBoardingOne());
+        return MaterialPageRoute(builder: (context) => const OnBoardingOne());
       case '/onboardingtwo':
         return MaterialPageRoute(builder: (context) => const OnboardingTwo());
       case '/home':

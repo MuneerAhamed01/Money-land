@@ -67,6 +67,18 @@ int? getKey(List<AddTransaction> getKey, int key) {
   return accessKey;
 }
 
+int? getKeyCategory(List<Categories> getKey, String key) {
+  int? accessKey;
+
+  for (var i = 0; i < getKey.length; i++) {
+    if (getKey[i].category == key) {
+      accessKey = getKey[i].key;
+      break;
+    }
+  }
+  return accessKey;
+}
+
 List<AddTransaction> gotoFilter(
     {required DateTime range,
     required TabController controller,

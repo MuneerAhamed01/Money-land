@@ -66,7 +66,11 @@ bottomSheet(BuildContext context, String type, int index, Creating typeof,
                       } else {
                         db_Categories.updateCatogry(index,
                             Categories(category: category, type: dbType));
-                        Navigator.pop(ctx);
+                        final dbUpdate =
+                            Hive.box<Categories>(db_Name).get(index);
+                        Navigator.pop(ctx); 
+
+                        gotoEditCategory(initial!, dbUpdate!);
                       }
                     } else {
                       snackbarOf(ctx);
@@ -129,6 +133,24 @@ categorySelector(List<AddTransaction> listTrans, Categories categories) {
     if (listTrans[i].category!.category == categories.category) {
       final deleteTrans = listTrans[i].key;
       db_trans.deleteTransaction(deleteTrans);
+    }
+  }
+}
+
+gotoEditCategory(String initial, Categories categories) {
+  final hiveList = Hive.box<AddTransaction>(db_transaction);
+  final listTrans = hiveList.values.toList();
+  print(listTrans[0].category);
+  for (var i = 0; i < listTrans.length; i++) {
+    if (listTrans[i].category!.category == initial) {
+      hiveList.putAt(
+          listTrans[i].key,
+          AddTransaction(
+              category: categories,
+              date: listTrans[i].date,
+              amount: listTrans[i].amount,
+              notes: listTrans[i].notes,
+              type: listTrans[i].type));
     }
   }
 }

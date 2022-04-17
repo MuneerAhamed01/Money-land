@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
+import 'package:money_land/database/database_crud/db_crud_categories.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/main.dart';
@@ -10,6 +11,7 @@ import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/homepage/assest/widgets.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../global/functions/functions.dart';
 
@@ -284,7 +286,11 @@ class _HomePageState extends State<HomePage>
                         reverse: true,
                         itemBuilder: (context, index) {
                           final list = listOf[index];
-                          // final int? accesKey = getKey(listBox, list.key!);
+
+                          final listCategory =
+                              Hive.box<Categories>(db_Name).values.toList();
+                          final categoryKey = getKeyCategory(
+                              listCategory, list.category!.category!);
 
                           String formattedDate =
                               DateFormat("dd-MM-yyyy").format(list.date!);
@@ -301,6 +307,7 @@ class _HomePageState extends State<HomePage>
                                   "notes": list.notes,
                                   "key": list.key,
                                   "type": list.type,
+                                  "categoryKey": categoryKey
                                 },
                               );
                             },
@@ -325,9 +332,27 @@ class _HomePageState extends State<HomePage>
                                     ),
                                     title: Text(list.category!.category!),
                                     subtitle: Text(formattedDate),
-                                    trailing: Text(
-                                      "₹${list.amount}",
-                                      style: boldText(21),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          "₹${list.amount}",
+                                          style: boldText(21),
+                                        ),
+                                        SizedBox(
+                                          width: mediaQueryWidth(context, 0.02),
+                                        ),
+                                        Icon(
+                                          list.type == CategoryType.income
+                                              ? Icons.arrow_circle_up_outlined
+                                              : Icons.arrow_circle_down,
+                                          size: 20,
+                                          color:
+                                              list.type == CategoryType.income
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   const Divider(),

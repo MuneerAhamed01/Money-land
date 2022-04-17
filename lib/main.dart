@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names, prefer_const_declarations
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:money_land/database/database_crud/db_crud_transaction.dart';
 import 'package:money_land/themes/routes/routes.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -14,6 +15,8 @@ final db_transaction = 'Transaction';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
   await Hive.initFlutter();
   if (!Hive.isAdapterRegistered(CategoriesAdapter().typeId)) {
     Hive.registerAdapter(CategoriesAdapter());
@@ -42,8 +45,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         errorColor: Colors.grey,
-        // canvasColor: Colors.transparent,
-        // scaffoldBackgroundColor: Colors.white,
+
       ),
       onGenerateRoute: RouteGenerator.generateRoute,
     );
