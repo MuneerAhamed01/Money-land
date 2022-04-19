@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
@@ -20,7 +17,7 @@ showDate(BuildContext context, TabController controller) {
             children: [
               TabBar(
                 controller: controller,
-                labelColor: Colors.black,
+                labelColor: realBlack,
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicator: BoxDecoration(color: themeColor),
                 tabs: const [
@@ -34,9 +31,9 @@ showDate(BuildContext context, TabController controller) {
                   onPressed: () {
                     Navigator.pop(ctx);
                   },
-                  child: const Text(
+                  child: Text(
                     "SAVE",
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: realBlack),
                   ))
             ],
           ),

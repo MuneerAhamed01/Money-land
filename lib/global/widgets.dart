@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class FadeRoute1 extends PageRouteBuilder {
   final Widget page;
@@ -43,4 +46,26 @@ class FadeRoute2 extends PageRouteBuilder {
             );
           },
         );
+}
+
+class NotificationApi {
+  static final _notificaion = FlutterLocalNotificationsPlugin();
+
+  static notificationDetails() async {
+    return const NotificationDetails(
+        iOS: IOSNotificationDetails(),
+        android: AndroidNotificationDetails(
+          "CHANNEL_ID",
+          "CHANNEL_NAME",
+          channelDescription: "CHANNEL_DESCRIPSION",
+          importance: Importance.max,
+          priority: Priority.max,
+        ));
+  }
+
+  static Future showNotification(
+      {int id = 0, String? title, String? body, String? payload}) async {
+    return _notificaion.show(id, title, body, await notificationDetails(),
+        payload: payload);
+  }
 }

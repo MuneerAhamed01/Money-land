@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
@@ -39,9 +40,9 @@ class _IncomeState extends State<Income> {
                         "lib/global/images/sentiment_very_dissatisfied.svg",
                         color: Colors.grey,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text("No category available"),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.h),
+                        child: const Text("No category available"),
                       ),
                     ],
                   ))
@@ -52,13 +53,13 @@ class _IncomeState extends State<Income> {
                     itemBuilder: (context, index) {
                       // addIncome(box.values.toList());
                       return Card(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 10.w, vertical: 5.h),
                         child: ListTile(
                           title: Text(
                             inc[index].category!,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 20),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 20.sp),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,

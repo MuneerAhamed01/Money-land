@@ -27,10 +27,13 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  awesome_notifications: ^0.6.21
+  
+  
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
+  flutter_local_notifications: ^9.4.0
+  flutter_screenutil: ^5.4.0
   flutter_slidable: ^1.2.0
   flutter_svg: ^1.0.3
   google_fonts: ^2.3.1
@@ -41,6 +44,7 @@ dependencies:
   shared_preferences: ^2.0.13
   shimmer: ^2.0.0
   syncfusion_flutter_charts: ^19.4.56
+  awesome_notifications: ^0.6.21
   
 
 dev_dependencies:

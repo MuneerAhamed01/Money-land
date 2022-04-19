@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import 'package:money_land/main.dart';
@@ -32,7 +33,7 @@ bottomSheet(BuildContext context, String type, int index, Creating typeof,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 60, left: 20, right: 20),
+                  padding: EdgeInsets.only(top: 60.h, left: 20.w, right: 20.w),
                   child: Form(
                     // autovalidateMode: AutovalidateMode.onUserInteraction,
                     key: key,
@@ -68,7 +69,7 @@ bottomSheet(BuildContext context, String type, int index, Creating typeof,
                             Categories(category: category, type: dbType));
                         final dbUpdate =
                             Hive.box<Categories>(db_Name).get(index);
-                        Navigator.pop(ctx); 
+                        Navigator.pop(ctx);
 
                         gotoEditCategory(initial!, dbUpdate!);
                       }
@@ -76,10 +77,10 @@ bottomSheet(BuildContext context, String type, int index, Creating typeof,
                       snackbarOf(ctx);
                     }
                   },
-                  child: const Text(
+                  child: Text(
                     "Save",
                     style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   ),
@@ -140,7 +141,7 @@ categorySelector(List<AddTransaction> listTrans, Categories categories) {
 gotoEditCategory(String initial, Categories categories) {
   final hiveList = Hive.box<AddTransaction>(db_transaction);
   final listTrans = hiveList.values.toList();
-  print(listTrans[0].category);
+
   for (var i = 0; i < listTrans.length; i++) {
     if (listTrans[i].category!.category == initial) {
       hiveList.putAt(

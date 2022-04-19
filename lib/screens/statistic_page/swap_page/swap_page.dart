@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_land/screens/statistic_page/statistic.dart';
 import 'package:money_land/screens/statistic_page/statistics_income.dart';
+import 'package:money_land/themes/colors/colors.dart';
 
 class SwapInStatics extends StatefulWidget {
   const SwapInStatics({Key? key}) : super(key: key);
@@ -15,13 +16,13 @@ class _SwapInStaticsState extends State<SwapInStatics> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: realWhite,
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                backgroundColor: Colors.white,
-                shadowColor: Colors.transparent,
+                backgroundColor: realWhite,
+                shadowColor: transparent,
                 actions: [
                   IconButton(
                       onPressed: () {
@@ -29,15 +30,15 @@ class _SwapInStaticsState extends State<SwapInStatics> {
                           swaped = !swaped;
                         });
                       },
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.swap_horiz,
-                        color: Colors.black,
+                        color: realBlack,
                       )),
                 ],
               )
             ];
           },
-          body: swaped == true ? Statistic() : StatisticIncome(),
+          body: swaped == true ? const Statistic() : const StatisticIncome(),
         ));
   }
 }

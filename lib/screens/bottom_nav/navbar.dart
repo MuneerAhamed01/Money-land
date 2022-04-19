@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/screens/add_page/add_page.dart';
@@ -20,7 +21,7 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   List screens = [
-    const HomePage(),
+    HomePage(),
     const SwapInStatics(),
     const AddPage(
       editValues: {},
@@ -34,16 +35,14 @@ class _NavBarState extends State<NavBar> {
     return Scaffold(
       body: screens[currentIndex],
       bottomNavigationBar: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        // height: mediaQuery(context, 0.08),
-        // decoration: roundedConrnerNav(),
+        borderRadius: BorderRadius.circular(15.r),
         child: BottomNavigationBar(
           backgroundColor: lightColor,
           type: BottomNavigationBarType.fixed,
           showUnselectedLabels: false,
-          selectedItemColor: const Color.fromRGBO(255, 103, 103, 100),
-          unselectedItemColor: Colors.grey,
-          iconSize: 26,
+          selectedItemColor: selectedItem,
+          unselectedItemColor: realGrey,
+          iconSize: 26.sp,
           items: [
             navItem(Icons.home_sharp, "Home"),
             navItem(Icons.pie_chart, "Statistic"),

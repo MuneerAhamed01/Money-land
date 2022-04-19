@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 BoxDecoration roundedConrnerStatic(Color color) {
   return BoxDecoration(
-    borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+    borderRadius: BorderRadius.vertical(top: Radius.circular(15.r)),
     color: color,
   );
 }
 
 BoxDecoration circleDate(Color color) {
   return BoxDecoration(
-    borderRadius: BorderRadius.all(Radius.circular(40)),
+    borderRadius: BorderRadius.all(Radius.circular(40.r)),
     color: color,
   );
 }
@@ -26,7 +26,7 @@ Widget datePickerOf(String type, BuildContext context) {
     child: Text(
       type,
       style: TextStyle(
-        color: Colors.black,
+        color: realBlack,
       ),
       textAlign: TextAlign.center,
     ),
@@ -36,7 +36,7 @@ Widget datePickerOf(String type, BuildContext context) {
 BoxDecoration roundedConrnerStaristic(Color color) {
   return BoxDecoration(
     border: Border.all(color: themeColor),
-    borderRadius: BorderRadius.circular(5),
+    borderRadius: BorderRadius.circular(5.r),
     color: color,
   );
 }

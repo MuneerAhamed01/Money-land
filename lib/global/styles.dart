@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_land/themes/colors/colors.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 TextStyle boldText(double size) {
-  return TextStyle(fontSize: size, fontWeight: FontWeight.bold);
+  return TextStyle(fontSize: size.sp, fontWeight: FontWeight.bold);
 }
 
 BottomNavigationBarItem navItem(
@@ -19,6 +20,6 @@ BottomNavigationBarItem navItem(
 }
 
 TextStyle titleText() {
-  return const TextStyle(
-      fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black);
+  return TextStyle(
+      fontSize: 20.sp, fontWeight: FontWeight.bold, color: realBlack);
 }

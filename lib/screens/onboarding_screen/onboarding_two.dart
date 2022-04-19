@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:money_land/screens/splash_screen/splash_screen.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../global/styles.dart';
 import '../../themes/colors/colors.dart';
 
@@ -25,7 +25,7 @@ class OnboardingTwo extends StatelessWidget {
               ),
               Text(
                 "Track your income\nand expense.",
-                style: boldText(40),
+                style: boldText(40.sp),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -33,25 +33,26 @@ class OnboardingTwo extends StatelessWidget {
 
           // ignore: prefer_const_constructors
           Padding(
-            padding: const EdgeInsets.only(top: 40),
+            padding: EdgeInsets.only(top: 40.h),
             child: ElevatedButton(
               onPressed: () {
                 sharedPreferences.setBool("move", true);
                 Navigator.pushReplacementNamed(context, '/home');
               },
-              child: const Text(
+              child: Text(
                 "   Next   ",
                 style: TextStyle(
-                    color: Colors.black,
+                    color: realBlack,
                     fontWeight: FontWeight.bold,
-                    fontSize: 25),
+                    fontSize: 25.sp),
               ),
               style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  primary: lightColor,
-                  shadowColor: Colors.transparent),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                primary: lightColor,
+                shadowColor: transparent,
+              ),
             ),
           )
         ],

@@ -11,9 +11,8 @@ import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/homepage/assest/widgets.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
-import 'package:shimmer/shimmer.dart';
-
 import '../../global/functions/functions.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -80,9 +79,9 @@ class _HomePageState extends State<HomePage>
     totalIncome = totalTransaction(filteredList, CategoryType.income);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 251, 245, 245),
+      backgroundColor: homeScaffoldBackground,
       appBar: AppBar(
-        shadowColor: Colors.transparent,
+        shadowColor: transparent,
         centerTitle: true,
         title: Text(
           "Home",
@@ -91,7 +90,7 @@ class _HomePageState extends State<HomePage>
         backgroundColor: lightColor,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 5),
+            padding: EdgeInsets.only(right: 5.w),
             child: IconButton(
               icon: Icon(
                 Icons.calendar_month_outlined,
@@ -131,7 +130,7 @@ class _HomePageState extends State<HomePage>
                                   },
                                   child: Text(
                                     dateInRangeFormated!,
-                                    style: const TextStyle(color: Colors.black),
+                                    style: TextStyle(color: realBlack),
                                   )),
                             ),
                             IconButton(
@@ -148,7 +147,7 @@ class _HomePageState extends State<HomePage>
                       ],
                     )
                   : Padding(
-                      padding: const EdgeInsets.only(left: 20, top: 12),
+                      padding: EdgeInsets.only(left: 20.w, top: 12.h),
                       child: Row(
                         children: [
                           datePickerOfHome(0, context, rangeOfPeriod),
@@ -172,7 +171,7 @@ class _HomePageState extends State<HomePage>
                     decoration: roundedConrner(lightColor)),
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                      EdgeInsets.symmetric(vertical: 40.h, horizontal: 20.w),
                   child: Stack(
                     children: [
                       Container(
@@ -183,37 +182,36 @@ class _HomePageState extends State<HomePage>
                           totalIncome! > totalExp!
                               ? '₹${totalIncome! - totalExp!}'
                               : "₹ 0.00",
-                          style: const TextStyle(
-                              fontSize: 65, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 55.sp, fontWeight: FontWeight.bold),
                         ),
-                        decoration: roundedConrner(
-                            const Color.fromARGB(156, 253, 202, 202)),
+                        decoration: roundedConrner(currentBalanceHome),
                       ),
                       Container(
                         alignment: Alignment.center,
                         height: mediaQuery(context, 0.03),
                         width: mediaQueryWidth(context, 0.29),
                         decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10)),
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10.r),
+                              bottomRight: Radius.circular(10.r)),
                           color: themeColor,
                         ),
                         child: Text(
                           dateInRange == now ? "Current Balance" : "Balance",
-                          style: const TextStyle(
-                              fontSize: 14, color: Colors.white),
+                          style: TextStyle(fontSize: 14.sp, color: realWhite),
                         ),
                       )
                     ],
                   ),
                 ),
                 Positioned(
-                  bottom: -28,
-                  left: 12,
-                  right: 4,
+                  bottom: -28.h,
+                  left: 9.w,
+                  right: 8.w,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       transactionContainer(context, 'Income', '₹ $totalIncome'),
                       transactionContainer(
@@ -233,10 +231,10 @@ class _HomePageState extends State<HomePage>
             Visibility(
               visible: visbleOf(),
               child: Padding(
-                padding: const EdgeInsets.only(left: 17.5),
+                padding: EdgeInsets.only(left: 17.5.w),
                 child: Text(
                   "Your Transaction :",
-                  style: boldText(17),
+                  style: boldText(17.sp),
                 ),
               ),
             ),
@@ -256,7 +254,7 @@ class _HomePageState extends State<HomePage>
 
                   if (listOf.isEmpty) {
                     return Padding(
-                      padding: const EdgeInsets.only(top: 60),
+                      padding: EdgeInsets.only(top: 60.h),
                       child: Center(
                         child: Column(
                           children: [
@@ -266,9 +264,9 @@ class _HomePageState extends State<HomePage>
                               opacity: const AlwaysStoppedAnimation(100),
                               color: themeColor,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 10),
-                              child: Text(
+                            Padding(
+                              padding: EdgeInsets.only(top: 10.h),
+                              child: const Text(
                                 "No transaction Found",
                                 textAlign: TextAlign.center,
                               ),
@@ -312,9 +310,8 @@ class _HomePageState extends State<HomePage>
                               );
                             },
                             child: Card(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 11),
-                              shadowColor: Colors.grey[350],
+                              margin: EdgeInsets.symmetric(horizontal: 11.w),
+                              shadowColor: realGrey350,
                               child: Column(
                                 children: [
                                   ListTile(
@@ -327,7 +324,7 @@ class _HomePageState extends State<HomePage>
                                         list.type == CategoryType.income
                                             ? "INC"
                                             : "EXP",
-                                        style: boldText(17),
+                                        style: boldText(17.sp),
                                       ),
                                     ),
                                     title: Text(list.category!.category!),
@@ -337,7 +334,7 @@ class _HomePageState extends State<HomePage>
                                       children: [
                                         Text(
                                           "₹${list.amount}",
-                                          style: boldText(21),
+                                          style: boldText(21.sp),
                                         ),
                                         SizedBox(
                                           width: mediaQueryWidth(context, 0.02),
@@ -346,18 +343,18 @@ class _HomePageState extends State<HomePage>
                                           list.type == CategoryType.income
                                               ? Icons.arrow_circle_up_outlined
                                               : Icons.arrow_circle_down,
-                                          size: 20,
+                                          size: 20.sp,
                                           color:
                                               list.type == CategoryType.income
-                                                  ? Colors.green
-                                                  : Colors.red,
+                                                  ? realGreen
+                                                  : realRed,
                                         ),
                                       ],
                                     ),
                                   ),
                                   const Divider(),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 10),
+                                    padding: EdgeInsets.only(top: 10.h),
                                     child:
                                         detailsView(16, 'Notes :', list.notes!),
                                   ),
@@ -372,7 +369,7 @@ class _HomePageState extends State<HomePage>
                         separatorBuilder: (context, index) => Container(
                               height: mediaQuery(context, 0.01),
                               width: double.infinity,
-                              color: const Color.fromARGB(255, 251, 245, 245),
+                              color: listSeperator,
                             ),
                         itemCount: listOf.length);
                   }
@@ -387,13 +384,13 @@ class _HomePageState extends State<HomePage>
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.r)),
         // contentPadding: EdgeInsets.only(left: 20),
-        content: const Text('You want to delete the transaction'),
+        content: Text('You want to delete the transaction'),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, 'Cancel'),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -401,7 +398,7 @@ class _HomePageState extends State<HomePage>
               Navigator.pop(context, 'OK');
               setState(() {});
             },
-            child: const Text('OK'),
+            child: Text('OK'),
           ),
         ],
       ),
@@ -454,8 +451,8 @@ class _HomePageState extends State<HomePage>
         decoration: roundedConrnerHome(lightColor),
         child: Text(
           type == 0 ? rangeTextStart : rangeTextEnd,
-          style: const TextStyle(
-            color: Colors.black,
+          style: TextStyle(
+            color: realBlack,
           ),
           textAlign: TextAlign.center,
         ),

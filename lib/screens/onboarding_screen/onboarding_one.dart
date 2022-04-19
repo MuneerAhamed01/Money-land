@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_land/global/styles.dart';
 
 import 'package:money_land/themes/colors/colors.dart';
@@ -13,29 +13,30 @@ class OnBoardingOne extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20, bottom: 20),
-            child: Text(
-              "Make your finance\nBetter with us",
-              style: boldText(40),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SizedBox(
+              height: 76.h,
             ),
-          ),
-          SizedBox(height: mediaQuery(context, 0.2)),
-          SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Stack(
+            Padding(
+              padding: EdgeInsets.only(right: 20.w, bottom: 20.h),
+              child: Text(
+                "Make your finance\nBetter with us",
+                style: boldText(40.sp),
+              ),
+            ),
+            SizedBox(height: mediaQuery(context, 0.2)),
+            Stack(
               alignment: AlignmentDirectional.bottomEnd,
               clipBehavior: Clip.none,
               children: [
                 SvgPicture.asset(
                     "lib/screens/onboarding_screen/assest/images/imageofboard.svg"),
                 Positioned(
-                  right: -45,
+                  right: -45.w,
                   child: SizedBox(
                     height: mediaQuery(context, 0.08),
                     width: mediaQueryWidth(context, 0.20),
@@ -45,17 +46,17 @@ class OnBoardingOne extends StatelessWidget {
                           Navigator.pushReplacementNamed(
                               context, '/onboardingtwo');
                         },
-                        child: const Icon(
+                        child: Icon(
                           Icons.arrow_forward_ios_rounded,
-                          color: Colors.black,
-                          size: 25,
+                          color: realBlack,
+                          size: 25.sp,
                         )),
                   ),
                 )
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

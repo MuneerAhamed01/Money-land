@@ -1,17 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_land/database/database_crud/db_crud_categories.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/screens/category_page/assest/functions.dart';
-import 'package:money_land/screens/category_page/tabs/income_tab.dart';
-import 'package:money_land/themes/colors/colors.dart';
-
-import '../../../global/styles.dart';
-import '../../../themes/mediaquery/mediaquery.dart';
 
 // ignore: must_be_immutable
 class Expense extends StatefulWidget {
@@ -48,9 +42,9 @@ class _ExpenseState extends State<Expense> {
                         "lib/global/images/sentiment_very_dissatisfied.svg",
                         color: Colors.grey,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text("No category available"),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20.h),
+                        child: const Text("No category available"),
                       ),
                     ],
                   ))
@@ -61,13 +55,13 @@ class _ExpenseState extends State<Expense> {
                     itemBuilder: (context, index) {
                       // final expense = addExpense(box.values.toList());
                       return Card(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 10.w, vertical: 5.h),
                         child: ListTile(
                           title: Text(
                             exp[index].category!,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 20),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 20.sp),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,

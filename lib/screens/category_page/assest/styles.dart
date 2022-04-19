@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../themes/colors/colors.dart';
 
 BoxDecoration roundedConrnerCatgory(Color color) {
   return BoxDecoration(
-    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
     color: color,
   );
 }
@@ -12,7 +13,7 @@ BoxDecoration roundedConrnerCatgory(Color color) {
 ButtonStyle styleButtonBottom(BuildContext context) => ElevatedButton.styleFrom(
     // maximumSize: Size(10, 10),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(10.r),
     ),
     primary: lightColor,
     shadowColor: Colors.transparent);

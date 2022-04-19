@@ -14,6 +14,7 @@ import '../../global/functions/functions.dart';
 import '../homepage/assest/functions.dart';
 import '../homepage/assest/widgets.dart';
 import 'assests/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StatisticIncome extends StatefulWidget {
   const StatisticIncome({Key? key}) : super(key: key);
@@ -91,7 +92,7 @@ class _StatisticState extends State<StatisticIncome>
                     height: mediaQuery(context, 0.18),
                     width: double.infinity,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      padding: EdgeInsets.symmetric(horizontal: 15.w),
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +131,7 @@ class _StatisticState extends State<StatisticIncome>
                                     themeColor,
                                     Colors.green,
                                     Colors.amber,
-                                    Color.fromARGB(255, 8, 140, 37),
+                                    const Color.fromARGB(255, 8, 140, 37),
                                     const Color.fromRGBO(116, 180, 155, 1),
                                     const Color.fromRGBO(0, 168, 181, 1),
                                     const Color.fromRGBO(73, 76, 162, 1),
@@ -161,52 +162,45 @@ class _StatisticState extends State<StatisticIncome>
                         ),
                         Padding(
                           padding: _dateController.index <= 2
-                              ? const EdgeInsets.symmetric(horizontal: 20)
-                              : const EdgeInsets.symmetric(horizontal: 10),
+                              ? EdgeInsets.symmetric(horizontal: 10.w)
+                              : EdgeInsets.only(right: 10.w),
                           child: Row(
-                            // mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: TabBar(
-                                  labelColor: Colors.black,
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  indicator: circleDate(themeColor),
-                                  tabs: const [
-                                    Tab(text: 'D'),
-                                    Tab(text: 'M'),
-                                    Tab(text: 'Y'),
-                                    Tab(text: 'P'),
-                                  ],
-                                  controller: _dateController,
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 70.w),
+                                  child: TabBar(
+                                    labelColor: Colors.black,
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    indicator: circleDate(themeColor),
+                                    tabs: const [
+                                      Tab(text: 'D'),
+                                      Tab(text: 'M'),
+                                      Tab(text: 'Y'),
+                                      Tab(text: 'P'),
+                                    ],
+                                    controller: _dateController,
+                                  ),
                                 ),
                               ),
-                              SizedBox(
-                                width: mediaQueryWidth(context, 0.25),
-                              ),
-                              Container(
-                                  child: _dateController.index == 0
-                                      ? InkWell(
-                                          onTap: () async {
-                                            monthPicker = await datePicker(
-                                                context, 'dd', monthPicker);
-                                            setState(() {});
-                                          },
-                                          child: datePickerOf(
-                                              formateDay ?? "Day", context))
-                                      : _dateController.index == 1
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                      child: _dateController.index == 0
                                           ? InkWell(
                                               onTap: () async {
-                                                monthPicker =
-                                                    await datePickerNew(
-                                                        context,
-                                                        _dateController,
-                                                        monthPicker);
+                                                monthPicker = await datePicker(
+                                                    context, 'dd', monthPicker);
+
                                                 setState(() {});
                                               },
                                               child: datePickerOf(
-                                                  formattedMonth ?? 'Month',
-                                                  context))
-                                          : _dateController.index == 2
+                                                  formateDay ?? "Day", context))
+                                          : _dateController.index == 1
                                               ? InkWell(
                                                   onTap: () async {
                                                     monthPicker =
@@ -217,48 +211,66 @@ class _StatisticState extends State<StatisticIncome>
                                                     setState(() {});
                                                   },
                                                   child: datePickerOf(
-                                                      formattedYear ?? "Year",
+                                                      formattedMonth ?? 'Month',
                                                       context))
-                                              : Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    InkWell(
-                                                        onTap: () async {
-                                                          range =
-                                                              await dateRangePicker(
+                                              : _dateController.index == 2
+                                                  ? InkWell(
+                                                      onTap: () async {
+                                                        monthPicker =
+                                                            await datePickerNew(
+                                                                context,
+                                                                _dateController,
+                                                                monthPicker);
+                                                        setState(() {});
+                                                      },
+                                                      child: datePickerOf(
+                                                          formattedYear ??
+                                                              "Year",
+                                                          context))
+                                                  : Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        InkWell(
+                                                            onTap: () async {
+                                                              range =
+                                                                  await dateRangePicker(
+                                                                      context,
+                                                                      range);
+                                                              setState(() {});
+                                                            },
+                                                            child: datePickerOf(
+                                                                rangeTextStart ??
+                                                                    "From",
+                                                                context)),
+                                                        SizedBox(
+                                                          width:
+                                                              mediaQueryWidth(
                                                                   context,
-                                                                  range);
-                                                          setState(() {});
-                                                        },
-                                                        child: datePickerOf(
-                                                            rangeTextStart ??
-                                                                "From",
-                                                            context)),
-                                                    SizedBox(
-                                                      width: mediaQueryWidth(
-                                                          context, 0.01),
-                                                    ),
-                                                    InkWell(
-                                                        onTap: () async {
-                                                          range =
-                                                              await dateRangePicker(
-                                                                  context,
-                                                                  range);
-                                                          setState(() {});
-                                                        },
-                                                        child: datePickerOf(
-                                                            rangeTextEnd ??
-                                                                "To",
-                                                            context))
-                                                  ],
-                                                ))
+                                                                  0.01),
+                                                        ),
+                                                        InkWell(
+                                                            onTap: () async {
+                                                              range =
+                                                                  await dateRangePicker(
+                                                                      context,
+                                                                      range);
+                                                              setState(() {});
+                                                            },
+                                                            child: datePickerOf(
+                                                                rangeTextEnd ??
+                                                                    "To",
+                                                                context))
+                                                      ],
+                                                    )),
+                                ],
+                              )
                             ],
                           ),
                         ),
                         const Divider(),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(top: 10.h),
                           child: ValueListenableBuilder(
                               valueListenable:
                                   Hive.box<AddTransaction>(db_transaction)
@@ -276,7 +288,7 @@ class _StatisticState extends State<StatisticIncome>
 
                                 if (filteredList.isEmpty) {
                                   return Padding(
-                                    padding: const EdgeInsets.only(top: 60),
+                                    padding: EdgeInsets.only(top: 60.h),
                                     child: Center(
                                       child: Column(
                                         children: [
@@ -288,9 +300,9 @@ class _StatisticState extends State<StatisticIncome>
                                                     100),
                                             color: themeColor,
                                           ),
-                                          const Padding(
-                                            padding: EdgeInsets.only(top: 10),
-                                            child: Text(
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 10.h),
+                                            child: const Text(
                                               "No transaction Found",
                                               textAlign: TextAlign.center,
                                             ),
@@ -338,8 +350,8 @@ class _StatisticState extends State<StatisticIncome>
                                                 });
                                           },
                                           child: Card(
-                                            margin: const EdgeInsets.symmetric(
-                                                horizontal: 10),
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 10.w),
                                             shadowColor: Colors.grey[350],
                                             child: Column(
                                               children: [
@@ -385,7 +397,7 @@ class _StatisticState extends State<StatisticIncome>
                                                                 .arrow_circle_up_outlined
                                                             : Icons
                                                                 .arrow_circle_down,
-                                                        size: 20,
+                                                        size: 20.sp,
                                                         color:
                                                             incomeList.type ==
                                                                     CategoryType
@@ -398,9 +410,8 @@ class _StatisticState extends State<StatisticIncome>
                                                 ),
                                                 const Divider(),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 10),
+                                                  padding: EdgeInsets.only(
+                                                      top: 10.h),
                                                   child: detailsView(
                                                       16,
                                                       'Notes :',
@@ -454,7 +465,7 @@ class _StatisticState extends State<StatisticIncome>
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.r)),
         // contentPadding: EdgeInsets.only(left: 20),
         content: const Text('You want to delete the transaction'),
         actions: <Widget>[

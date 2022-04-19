@@ -10,6 +10,7 @@ import 'package:money_land/screens/add_page/assest/widgets.dart';
 import 'package:money_land/screens/bottom_nav/navbar.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../category_page/assest/functions.dart';
 
@@ -258,7 +259,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           sizedBox(context),
                           initialValues.isEmpty
                               ? Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
+                                  padding: EdgeInsets.only(bottom: 20.h),
                                   child: Row(
                                     children: [
                                       const Text("OR"),
@@ -280,9 +281,9 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                             },
                                             child: Row(
                                               children: [
-                                                const Icon(
+                                                Icon(
                                                   Icons.add_box_rounded,
-                                                  size: 15,
+                                                  size: 15.sp,
                                                   color: Colors.black,
                                                 ),
                                                 SizedBox(
