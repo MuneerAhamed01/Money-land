@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names, prefer_const_declarations
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -33,6 +34,15 @@ main() async {
   await Hive.openBox<Categories>(db_Name);
   await Hive.openBox<AddTransaction>(db_transaction);
   await ScreenUtil.ensureScreenSize();
+  AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+        onlyAlertOnce: true,
+        importance: NotificationImportance.High,
+        channelKey: "Channel_key",
+        channelName: "Basic_notification",
+        channelDescription: "channelDescription")
+  ]);
+
   runApp(const MyApp());
 }
 

@@ -1,12 +1,17 @@
+import 'dart:math';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
-import 'package:money_land/global/widgets.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/themes/colors/colors.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../homepage/assest/functions.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -16,19 +21,55 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  bool value = false;
+  bool isSwitchedFT = false;
   @override
   void initState() {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('download');
-    var initializationSettingsAndroidOf =
-        InitializationSettings(android: initializationSettingsAndroid);
     super.initState();
+    getSwitchValues();
   }
+
+  getSwitchValues() async {
+    isSwitchedFT = await getSwitchState();
+    setState(() {});
+  }
+
+  Future<bool> saveSwitchState(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("switchState", value);
+    print('Switch Value saved $value');
+    return prefs.setBool("switchState", value);
+  }
+
+  Future<bool> getSwitchState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isSwitchedFT = prefs.getBool("switchState")!;
+    print(isSwitchedFT);
+
+    return isSwitchedFT;
+  }
+
+  double? totalExp;
+  double? totalIncome;
 
   @override
   Widget build(BuildContext context) {
-    
+    if (isSwitchedFT == true) {
+      AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 0,
+          channelKey: "Channel_key",
+          title: "Balance :💰 ${totalIncome! - totalExp!}",
+          body: 'Income : 🟢 $totalIncome  Expesne : 🔴 $totalExp',
+          fullScreenIntent: true,
+          displayOnBackground: true,
+          notificationLayout: NotificationLayout.Inbox,
+        ),
+      );
+    }
+    final transaction =
+        Hive.box<AddTransaction>(db_transaction).values.toList();
+    totalExp = totalTransaction(transaction, CategoryType.expense);
+    totalIncome = totalTransaction(transaction, CategoryType.income);
     List<AppSettings> settings = [
       AppSettings(icon: Icons.notifications, title: 'Notification'),
       AppSettings(icon: Icons.share, title: 'Share'),
@@ -51,7 +92,7 @@ class _SettingsState extends State<Settings> {
         itemBuilder: (context, index) {
           return ListTile(
               onTap: () {
-                gotoSettings(index);
+                gotoSettings(index, value: isSwitchedFT);
               },
               leading: Icon(settings[index].icon),
               title: Text(
@@ -62,11 +103,12 @@ class _SettingsState extends State<Settings> {
                   ? Switch(
                       activeTrackColor: themeColor,
                       activeColor: lightColor,
-                      value: value,
-                      onChanged: (val) {
-                        setState(() {
-                          value = val;
-                        });
+                      value: isSwitchedFT,
+                      onChanged: (value) async {
+                        setState(() {});
+                        isSwitchedFT = value;
+                        saveSwitchState(value);
+                        gotoSettings(0, value: value);
                       })
                   : null);
         },
@@ -75,21 +117,31 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  gotoSettings(int index) async {
-    final transaction =
-        Hive.box<AddTransaction>(db_transaction).values.toList();
+  gotoSettings(int index, {bool? value}) async {
     if (index == 0) {
-      NotificationApi.showNotification(
-          body: "transaction[0].notes",
-          title: "transaction[0].amount.toString()",
-          payload: "transaction[0].category!.category");
-      setState(() {
-        value = !value;
-      });
+      if (isSwitchedFT == true) {
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: 0,
+            channelKey: "Channel_key",
+            title: "Balance : ${totalIncome! - totalExp!}",
+            body: "Income : $totalIncome  Expesne : $totalExp",
+            fullScreenIntent: true,
+            displayOnBackground: true,
+            notificationLayout: NotificationLayout.Inbox,
+          ),
+        );
+      } else {
+        AwesomeNotifications().cancelAll();
+      }
     } else if (index == 1) {
     } else if (index == 2) {
     } else if (index == 3) {
     } else if (index == 4) {
+      const url = "https://muneerahamed01.github.io/MuneerAhamed/";
+      if (await canLaunch(url)) {
+        await launch(url);
+      }
     } else {
       showDialog<String>(
         context: context,

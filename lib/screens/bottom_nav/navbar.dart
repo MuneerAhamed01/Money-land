@@ -21,7 +21,7 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   List screens = [
-    HomePage(),
+    const HomePage(),
     const SwapInStatics(),
     const AddPage(
       editValues: {},

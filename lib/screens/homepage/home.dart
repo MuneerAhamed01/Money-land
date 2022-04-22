@@ -1,4 +1,6 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/database/database_crud/db_crud_categories.dart';
@@ -11,6 +13,7 @@ import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/homepage/assest/widgets.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../global/functions/functions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -34,6 +37,7 @@ class _HomePageState extends State<HomePage>
   void initState() {
     _datecontrollr = TabController(length: 4, vsync: this, initialIndex: 1);
     _datecontrollr.addListener(settings);
+    getSwitchValues();
 
     super.initState();
     rangeTextStart = formatPeriodStart(range);
@@ -52,6 +56,10 @@ class _HomePageState extends State<HomePage>
     setState(() {});
   }
 
+  SharedPreferences? prefs;
+  double? totalNotificationIncome;
+  double? totalNotificationExpense;
+  bool? isSwitchedFT;
   num? totalExp;
   double? totalIncome;
   DateTime dateInRange = now;
@@ -60,11 +68,24 @@ class _HomePageState extends State<HomePage>
   DateTimeRange range = initialDate;
   late String rangeTextStart;
   late String rangeTextEnd;
+  getSwitchValues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isSwitchedFT = prefs.getBool("switchState")!;
+    print(isSwitchedFT);
+
+    setState(() {});
+  }
 
   // ValueNotifier<bool> visible = ValueNotifier(fa);
 
   @override
   Widget build(BuildContext context) {
+    final transactionNotificaation =
+        Hive.box<AddTransaction>(db_transaction).values.toList();
+    totalNotificationExpense =
+        totalTransaction(transactionNotificaation, CategoryType.expense);
+    totalNotificationIncome =
+        totalTransaction(transactionNotificaation, CategoryType.income);
     List<AddTransaction> transaction =
         Hive.box<AddTransaction>(db_transaction).values.toList();
     dateInRangeFormated = formatted();
@@ -77,6 +98,21 @@ class _HomePageState extends State<HomePage>
 
     totalExp = totalTransaction(filteredList, CategoryType.expense);
     totalIncome = totalTransaction(filteredList, CategoryType.income);
+    if (isSwitchedFT == true) {
+      AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 0,
+          channelKey: "Channel_key",
+          title:
+              "Balance :💰 ${totalNotificationIncome! - totalNotificationExpense!}",
+          body:
+              'Income : 🟢 $totalNotificationIncome  Expesne : 🔴 $totalNotificationExpense',
+          fullScreenIntent: true,
+          displayOnBackground: true,
+          notificationLayout: NotificationLayout.Inbox,
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: homeScaffoldBackground,
@@ -278,100 +314,126 @@ class _HomePageState extends State<HomePage>
                       ),
                     );
                   } else {
-                    return ListView.separated(
-                        controller: ScrollController(),
-                        shrinkWrap: true,
-                        reverse: true,
-                        itemBuilder: (context, index) {
-                          final list = listOf[index];
+                    return AnimationLimiter(
+                      child: ListView.separated(
+                          controller: ScrollController(),
+                          shrinkWrap: true,
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            final list = listOf[index];
 
-                          final listCategory =
-                              Hive.box<Categories>(db_Name).values.toList();
-                          final categoryKey = getKeyCategory(
-                              listCategory, list.category!.category!);
+                            final listCategory =
+                                Hive.box<Categories>(db_Name).values.toList();
+                            final categoryKey = getKeyCategory(
+                                listCategory, list.category!.category!);
 
-                          String formattedDate =
-                              DateFormat("dd-MM-yyyy").format(list.date!);
-                          return GestureDetector(
-                            onLongPress: () => alertDialog(list.key, context),
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                '/editscreen',
-                                arguments: {
-                                  "date": list.date,
-                                  "category": list.category,
-                                  "amount": list.amount,
-                                  "notes": list.notes,
-                                  "key": list.key,
-                                  "type": list.type,
-                                  "categoryKey": categoryKey
-                                },
-                              );
-                            },
-                            child: Card(
-                              margin: EdgeInsets.symmetric(horizontal: 11.w),
-                              shadowColor: realGrey350,
-                              child: Column(
-                                children: [
-                                  ListTile(
-                                    leading: Container(
-                                      alignment: Alignment.center,
-                                      height: mediaQuery(context, 0.05),
-                                      width: mediaQueryWidth(context, 0.12),
-                                      decoration: roundedConrnerTwo(themeColor),
-                                      child: Text(
-                                        list.type == CategoryType.income
-                                            ? "INC"
-                                            : "EXP",
-                                        style: boldText(17.sp),
+                            String formattedDate =
+                                DateFormat("dd-MM-yyyy").format(list.date!);
+                            return AnimationConfiguration.staggeredList(
+                                position: index,
+                                delay: const Duration(milliseconds: 100),
+                                child: FadeInAnimation(
+                                  curve: Curves.fastLinearToSlowEaseIn,
+                                  duration: const Duration(milliseconds: 2500),
+                                  child: SlideAnimation(
+                                    curve: Curves.fastLinearToSlowEaseIn,
+                                    duration:
+                                        const Duration(milliseconds: 2500),
+                                    child: GestureDetector(
+                                      onLongPress: () =>
+                                          alertDialog(list.key, context),
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/editscreen',
+                                          arguments: {
+                                            "date": list.date,
+                                            "category": list.category,
+                                            "amount": list.amount,
+                                            "notes": list.notes,
+                                            "key": list.key,
+                                            "type": list.type,
+                                            "categoryKey": categoryKey
+                                          },
+                                        );
+                                      },
+                                      child: Card(
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 11.w),
+                                        shadowColor: realGrey350,
+                                        child: Column(
+                                          children: [
+                                            ListTile(
+                                              leading: Container(
+                                                alignment: Alignment.center,
+                                                height:
+                                                    mediaQuery(context, 0.05),
+                                                width: mediaQueryWidth(
+                                                    context, 0.12),
+                                                decoration: roundedConrnerTwo(
+                                                    themeColor),
+                                                child: Text(
+                                                  list.type ==
+                                                          CategoryType.income
+                                                      ? "INC"
+                                                      : "EXP",
+                                                  style: boldText(17.sp),
+                                                ),
+                                              ),
+                                              title: Text(
+                                                  list.category!.category!),
+                                              subtitle: Text(formattedDate),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    "₹${list.amount}",
+                                                    style: boldText(21.sp),
+                                                  ),
+                                                  SizedBox(
+                                                    width: mediaQueryWidth(
+                                                        context, 0.02),
+                                                  ),
+                                                  Icon(
+                                                    list.type ==
+                                                            CategoryType.income
+                                                        ? Icons
+                                                            .arrow_circle_up_outlined
+                                                        : Icons
+                                                            .arrow_circle_down,
+                                                    size: 20.sp,
+                                                    color: list.type ==
+                                                            CategoryType.income
+                                                        ? realGreen
+                                                        : realRed,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const Divider(),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 10.h),
+                                              child: detailsView(
+                                                  16, 'Notes :', list.notes!),
+                                            ),
+                                            SizedBox(
+                                              height: mediaQuery(context, 0.02),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    title: Text(list.category!.category!),
-                                    subtitle: Text(formattedDate),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          "₹${list.amount}",
-                                          style: boldText(21.sp),
-                                        ),
-                                        SizedBox(
-                                          width: mediaQueryWidth(context, 0.02),
-                                        ),
-                                        Icon(
-                                          list.type == CategoryType.income
-                                              ? Icons.arrow_circle_up_outlined
-                                              : Icons.arrow_circle_down,
-                                          size: 20.sp,
-                                          color:
-                                              list.type == CategoryType.income
-                                                  ? realGreen
-                                                  : realRed,
-                                        ),
-                                      ],
-                                    ),
                                   ),
-                                  const Divider(),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 10.h),
-                                    child:
-                                        detailsView(16, 'Notes :', list.notes!),
-                                  ),
-                                  SizedBox(
-                                    height: mediaQuery(context, 0.02),
-                                  )
-                                ],
+                                ));
+                          },
+                          separatorBuilder: (context, index) => Container(
+                                height: mediaQuery(context, 0.01),
+                                width: double.infinity,
+                                color: listSeperator,
                               ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, index) => Container(
-                              height: mediaQuery(context, 0.01),
-                              width: double.infinity,
-                              color: listSeperator,
-                            ),
-                        itemCount: listOf.length);
+                          itemCount: listOf.length),
+                    );
                   }
                 })
           ],

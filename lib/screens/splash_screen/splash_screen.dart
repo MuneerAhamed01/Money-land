@@ -1,5 +1,11 @@
+import 'dart:async';
+
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:money_land/global/styles.dart';
+import 'package:money_land/screens/bottom_nav/navbar.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences sharedPreferences;
@@ -11,12 +17,36 @@ class Splashscreen extends StatefulWidget {
   State<Splashscreen> createState() => _SplashscreenState();
 }
 
-class _SplashscreenState extends State<Splashscreen> {
+class _SplashscreenState extends State<Splashscreen>
+    with TickerProviderStateMixin {
+  AnimationController? scaleController;
+  Animation<double>? scaleAnimation;
+
   @override
   void initState() {
-    moveSplash(context);
-
+    scaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    scaleAnimation =
+        Tween<double>(begin: 0.0, end: 12).animate(scaleController!);
     super.initState();
+    gotoPermission();
+    moveSplash(context);
+  }
+
+  getSwitchValues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isSwitchedFT = prefs.getBool("switchState")!;
+    if (isSwitchedFT == true) {}
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    scaleController!.dispose();
   }
 
   @override
@@ -31,9 +61,15 @@ class _SplashscreenState extends State<Splashscreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: height * 0.12),
-                Text(
-                  "Money Land",
-                  style: boldText(50),
+                AnimatedTextKit(
+                  animatedTexts: [
+                    TyperAnimatedText("Money Land",
+                        textStyle: boldText(20),
+                        speed: const Duration(milliseconds: 150)),
+                  ],
+                  isRepeatingAnimation: false,
+                  repeatForever: false,
+                  displayFullTextOnTap: false,
                 ),
                 SizedBox(height: height * 0.15),
                 Image.asset(
@@ -50,9 +86,23 @@ class _SplashscreenState extends State<Splashscreen> {
 
     final value = sharedPreferences.getBool("move");
     if (value == true) {
-      Navigator.pushReplacementNamed(context, "/home");
+      Navigator.of(context).pushReplacement(
+        PageTransition(
+            opaque: true,
+            duration: const Duration(milliseconds: 1200),
+            type: PageTransitionType.rightToLeftWithFade,
+            child: const NavBar()),
+      );
     } else {
       Navigator.pushReplacementNamed(context, '/onboardingone');
     }
+  }
+
+  gotoPermission() {
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
   }
 }

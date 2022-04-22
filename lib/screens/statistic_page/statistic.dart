@@ -235,41 +235,44 @@ class _StatisticState extends State<Statistic>
                                                           formattedYear ??
                                                               "Year",
                                                           context))
-                                                  : Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        InkWell(
-                                                            onTap: () async {
-                                                              range =
-                                                                  await dateRangePicker(
-                                                                      context,
-                                                                      range);
-                                                              setState(() {});
-                                                            },
-                                                            child: datePickerOf(
-                                                                rangeTextStart ??
-                                                                    "From",
-                                                                context)),
-                                                        SizedBox(
-                                                          width:
-                                                              mediaQueryWidth(
-                                                                  context,
-                                                                  0.01),
-                                                        ),
-                                                        InkWell(
-                                                            onTap: () async {
-                                                              range =
-                                                                  await dateRangePicker(
-                                                                      context,
-                                                                      range);
-                                                              setState(() {});
-                                                            },
-                                                            child: datePickerOf(
-                                                                rangeTextEnd ??
-                                                                    "To",
-                                                                context))
-                                                      ],
+                                                  : SizedBox(
+                                                      width: 120.w,
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          InkWell(
+                                                              onTap: () async {
+                                                                range =
+                                                                    await dateRangePicker(
+                                                                        context,
+                                                                        range);
+                                                                setState(() {});
+                                                              },
+                                                              child: datePickerOf(
+                                                                  rangeTextStart ??
+                                                                      "From",
+                                                                  context)),
+                                                          SizedBox(
+                                                            width:
+                                                                mediaQueryWidth(
+                                                                    context,
+                                                                    0.01),
+                                                          ),
+                                                          InkWell(
+                                                              onTap: () async {
+                                                                range =
+                                                                    await dateRangePicker(
+                                                                        context,
+                                                                        range);
+                                                                setState(() {});
+                                                              },
+                                                              child: datePickerOf(
+                                                                  rangeTextEnd ??
+                                                                      "To",
+                                                                  context))
+                                                        ],
+                                                      ),
                                                     )),
                                 ],
                               )

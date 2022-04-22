@@ -1,63 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:money_land/global/styles.dart';
-
+import 'package:introduction_screen/introduction_screen.dart';
 import 'package:money_land/themes/colors/colors.dart';
-
-import '../../themes/mediaquery/mediaquery.dart';
+import '../splash_screen/splash_screen.dart';
 
 class OnBoardingOne extends StatelessWidget {
   const OnBoardingOne({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            SizedBox(
-              height: 76.h,
-            ),
-            Padding(
-              padding: EdgeInsets.only(right: 20.w, bottom: 20.h),
-              child: Text(
-                "Make your finance\nBetter with us",
-                style: boldText(40.sp),
+    return SafeArea(
+        child: IntroductionScreen(
+      pages: [
+        PageViewModel(
+            titleWidget: Text(
+              "Make your Finance \n Better",
+              style: TextStyle(
+                fontSize: 25.sp,
+                fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: mediaQuery(context, 0.2)),
-            Stack(
-              alignment: AlignmentDirectional.bottomEnd,
-              clipBehavior: Clip.none,
-              children: [
-                SvgPicture.asset(
-                    "lib/screens/onboarding_screen/assest/images/imageofboard.svg"),
-                Positioned(
-                  right: -45.w,
-                  child: SizedBox(
-                    height: mediaQuery(context, 0.08),
-                    width: mediaQueryWidth(context, 0.20),
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(primary: themeColor),
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                              context, '/onboardingtwo');
-                        },
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: realBlack,
-                          size: 25.sp,
-                        )),
-                  ),
-                )
-              ],
+            body: "Store the information of each transaction",
+            image: SvgPicture.asset(
+              "lib/screens/onboarding_screen/assest/images/005.svg",
+              width: 250.w,
+            )),
+        PageViewModel(
+            titleWidget: Text(
+              "Track your income\nand expense.",
+              style: TextStyle(
+                fontSize: 25.sp,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ],
+            body: "See your transactions in high details",
+            image: SvgPicture.asset(
+              "lib/screens/onboarding_screen/assest/images/undraw_stock_prices_re_js33.svg",
+              width: 250.w,
+            ))
+      ],
+      done: Padding(
+        padding: EdgeInsets.only(left: 25.w),
+        child: Text(
+          "Start",
+          style: TextStyle(color: realBlack, fontSize: 16.sp),
         ),
       ),
-    );
+      onDone: () {
+        sharedPreferences.setBool("move", true);
+        Navigator.pushReplacementNamed(context, '/home');
+      },
+      showNextButton: false,
+    ));
   }
 }
