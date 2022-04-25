@@ -32,8 +32,11 @@ class AddTransaction extends HiveObject {
   String? notes;
   @HiveField(4)
   CategoryType? type;
+  @HiveField(5)
+  bool visible;
 
   AddTransaction({
+    this.visible = false,
     this.date,
     this.category,
     this.amount,

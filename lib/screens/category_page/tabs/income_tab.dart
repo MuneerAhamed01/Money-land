@@ -104,9 +104,8 @@ class _IncomeState extends State<Income> {
           ),
           TextButton(
             onPressed: () async {
-              final deleteTrans = await db_trans.getTrasaction();
-              categorySelector(deleteTrans, delete);
               db_Categories.deleteCategory(delete.key);
+              gotoDelete(delete);
               Navigator.pop(context);
             },
             child: const Text('OK'),

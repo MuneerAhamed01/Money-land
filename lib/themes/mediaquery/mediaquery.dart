@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 mediaQuery(BuildContext context, double heightSize) {
-  var height = MediaQuery.of(context).size.height * heightSize.h;
+  var height = MediaQuery.of(context).size.height * heightSize.w;
   return height;
 }
 

@@ -108,10 +108,8 @@ class _ExpenseState extends State<Expense> {
           ),
           TextButton(
             onPressed: () async {
-              final deleteTransaction = await db_trans.getTrasaction();
-
-              categorySelector(deleteTransaction, delete);
               db_Categories.deleteCategory(delete.key);
+              gotoDelete(delete);
 
               Navigator.pop(context);
             },

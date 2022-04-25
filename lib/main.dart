@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:money_land/database/database_crud/db_crud_transaction.dart';
+import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/routes/routes.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_land/database/database_crud/db_crud_categories.dart';
@@ -34,8 +35,10 @@ main() async {
   await Hive.openBox<Categories>(db_Name);
   await Hive.openBox<AddTransaction>(db_transaction);
   await ScreenUtil.ensureScreenSize();
-  AwesomeNotifications().initialize(null, [
+  AwesomeNotifications()
+      .initialize("resource://drawable/res_notification_icon", [
     NotificationChannel(
+        locked: true,
         onlyAlertOnce: true,
         importance: NotificationImportance.High,
         channelKey: "Channel_key",
@@ -52,18 +55,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-        designSize: const Size(360, 800),
-        splitScreenMode: true,
-        minTextAdapt: true,
+        designSize: const Size(392.72727272727275, 825.4545454545455),
+        // splitScreenMode: true,
+        minTextAdapt: false,
         builder: (context) {
           return MaterialApp(
+            builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(textScaleFactor: 0.8),
+                child: child!),
+            useInheritedMediaQuery: true,
             localizationsDelegates: const [
               MonthYearPickerLocalizations.delegate,
             ],
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
-              textTheme: GoogleFonts.robotoSlabTextTheme(),
+              textTheme: TextTheme(
+                  bodyText2: TextStyle(fontSize: 14.sp),
+                  button: TextStyle(fontSize: 13.sp)),
               errorColor: Colors.grey,
+              canvasColor: transparent,
             ),
             onGenerateRoute: RouteGenerator.generateRoute,
           );

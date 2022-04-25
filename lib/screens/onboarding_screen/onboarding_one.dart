@@ -12,6 +12,7 @@ class OnBoardingOne extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
         child: IntroductionScreen(
+      globalBackgroundColor: realWhite,
       pages: [
         PageViewModel(
             titleWidget: Text(
@@ -50,7 +51,7 @@ class OnBoardingOne extends StatelessWidget {
         ),
       ),
       onDone: () {
-        sharedPreferences.setBool("move", true);
+        sharedPreferences!.setBool("key", true);
         Navigator.pushReplacementNamed(context, '/home');
       },
       showNextButton: false,

@@ -42,7 +42,7 @@ class _SettingsState extends State<Settings> {
 
   Future<bool> getSwitchState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isSwitchedFT = prefs.getBool("switchState")!;
+    bool isSwitchedFT = prefs.getBool("switchState") ?? false;
     print(isSwitchedFT);
 
     return isSwitchedFT;
@@ -90,27 +90,42 @@ class _SettingsState extends State<Settings> {
           )),
       body: ListView.builder(
         itemBuilder: (context, index) {
-          return ListTile(
-              onTap: () {
-                gotoSettings(index, value: isSwitchedFT);
-              },
-              leading: Icon(settings[index].icon),
-              title: Text(
-                "${settings[index].title}",
-                style: TextStyle(fontSize: 20.sp),
-              ),
-              trailing: index == 0
-                  ? Switch(
-                      activeTrackColor: themeColor,
-                      activeColor: lightColor,
-                      value: isSwitchedFT,
-                      onChanged: (value) async {
-                        setState(() {});
-                        isSwitchedFT = value;
-                        saveSwitchState(value);
-                        gotoSettings(0, value: value);
-                      })
-                  : null);
+          return index == 0
+              ? SwitchListTile(
+                  value: isSwitchedFT,
+                  activeTrackColor: themeColor,
+                  activeColor: lightColor,
+                  onChanged: (value) async {
+                    setState(() {});
+                    isSwitchedFT = value;
+                    saveSwitchState(value);
+                    gotoSettings(0, value: value);
+                  },
+                  title: Row(
+                    children: [
+                      Icon(settings[index].icon),
+                      SizedBox(
+                        width: 30.w,
+                      ),
+                      Text(
+                        "${settings[index].title}",
+                        style: TextStyle(fontSize: 20.sp),
+                      ),
+                    ],
+                  ),
+                )
+              : ListTile(
+                  textColor: realBlack,
+                  iconColor: realBlack,
+                  onTap: () {
+                    gotoSettings(index, value: isSwitchedFT);
+                  },
+                  leading: Icon(settings[index].icon),
+                  title: Text(
+                    "${settings[index].title}",
+                    style: TextStyle(fontSize: 20.sp),
+                  ),
+                );
         },
         itemCount: 6,
       ),

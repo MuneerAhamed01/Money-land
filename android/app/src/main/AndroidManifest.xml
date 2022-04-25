@@ -2,7 +2,7 @@
     package="com.example.money_land">
     
    <application
-        android:label="money_land"
+        android:label="Trackit"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
          <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">

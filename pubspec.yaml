@@ -59,6 +59,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator: ^1.1.2
+  flutter_app_name: ^0.1.0
+
+flutter_app_name:
+  name: "Trackit"
   
   
 
@@ -88,6 +92,8 @@ flutter:
     - lib/screens/onboarding_screen/assest/images/jaconda-time-management.png
     - lib/screens/onboarding_screen/assest/images/005.svg
     - lib/screens/onboarding_screen/assest/images/undraw_stock_prices_re_js33.svg
+    - lib/global/images/Group.svg
+    - lib/global/images/apklogoof.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

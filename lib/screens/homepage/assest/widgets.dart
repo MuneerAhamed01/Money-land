@@ -13,7 +13,7 @@ Widget transactionContainer(
       Container(
         alignment: Alignment.center,
         height: mediaQuery(context, 0.16),
-        width: mediaQueryWidth(context, 0.43),
+        width: 184.w,
         decoration: roundedConrner(transactionColor),
         child: Text(amount,
             style: TextStyle(

@@ -54,6 +54,7 @@ class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return AddTransaction(
+      visible: fields[5] as bool,
       date: fields[0] as DateTime?,
       category: fields[1] as Categories?,
       amount: fields[2] as double?,
@@ -65,7 +66,7 @@ class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
   @override
   void write(BinaryWriter writer, AddTransaction obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.date)
       ..writeByte(1)
@@ -75,7 +76,9 @@ class AddTransactionAdapter extends TypeAdapter<AddTransaction> {
       ..writeByte(3)
       ..write(obj.notes)
       ..writeByte(4)
-      ..write(obj.type);
+      ..write(obj.type)
+      ..writeByte(5)
+      ..write(obj.visible);
   }
 
   @override

@@ -15,3 +15,11 @@ BoxDecoration roundedConrnerTwo(Color color) {
     color: color,
   );
 }
+
+BoxDecoration roundedConrnerOf(Color color) {
+  return BoxDecoration(
+    // border: Border.all(color: themeColor),
+    borderRadius: BorderRadius.vertical(bottom: Radius.circular(5.r)),
+    color: color,
+  );
+}

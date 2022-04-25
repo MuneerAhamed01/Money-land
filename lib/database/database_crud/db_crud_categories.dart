@@ -8,7 +8,7 @@ String db_Name = "Categories";
 class CategoryDB {
   ValueNotifier<List<Categories>> income = ValueNotifier([]);
   ValueNotifier<List<Categories>> expense = ValueNotifier([]);
-  Future<void> addCategory(Categories value) async {
+  addCategory(Categories value) async {
     final dbOpen = Hive.box<Categories>(db_Name);
 
     await dbOpen.add(value);

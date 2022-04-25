@@ -61,9 +61,10 @@ bottomSheet(BuildContext context, String type, int index, Creating typeof,
                   onPressed: () {
                     if (key.currentState!.validate()) {
                       if (typeof == Creating.adding) {
+                        Navigator.pop(ctx);
                         db_Categories.addCategory(
                             Categories(category: category, type: dbType));
-                        Navigator.pop(ctx);
+                        gotoSearch(category!);
                       } else {
                         db_Categories.updateCatogry(index,
                             Categories(category: category, type: dbType));
@@ -152,6 +153,48 @@ gotoEditCategory(String initial, Categories categories) {
               amount: listTrans[i].amount,
               notes: listTrans[i].notes,
               type: listTrans[i].type));
+    }
+  }
+}
+
+gotoDelete(Categories categories) {
+  final hive = Hive.box<AddTransaction>(db_transaction);
+
+  final List<AddTransaction> list = hive.values.toList();
+
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].category!.category!.toLowerCase().trim() ==
+        categories.category!.toLowerCase().trim()) {
+      hive.put(
+          list[i].key,
+          AddTransaction(
+              visible: true,
+              date: list[i].date,
+              amount: list[i].amount,
+              category: list[i].category,
+              notes: list[i].notes,
+              type: list[i].type));
+    }
+  }
+}
+
+gotoSearch(String value) {
+  final hive = Hive.box<AddTransaction>(db_transaction);
+  final hiveList = hive.values.toList();
+  print(hiveList);
+  for (var i = 0; i < hiveList.length; i++) {
+    if (hiveList[i].category!.category!.toLowerCase().trim() ==
+        value.toLowerCase().trim()) {
+      hiveList[i].category!.category = value;
+      hive.put(
+          hiveList[i].key,
+          AddTransaction(
+              visible: false,
+              date: hiveList[i].date,
+              amount: hiveList[i].amount,
+              category: hiveList[i].category,
+              notes: hiveList[i].notes,
+              type: hiveList[i].type));
     }
   }
 }

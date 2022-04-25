@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/database/database_crud/db_crud_categories.dart';
@@ -70,8 +71,7 @@ class _HomePageState extends State<HomePage>
   late String rangeTextEnd;
   getSwitchValues() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    isSwitchedFT = prefs.getBool("switchState")!;
-    print(isSwitchedFT);
+    isSwitchedFT = prefs.getBool("switchState") ?? false;
 
     setState(() {});
   }
@@ -186,16 +186,22 @@ class _HomePageState extends State<HomePage>
                       padding: EdgeInsets.only(left: 20.w, top: 12.h),
                       child: Row(
                         children: [
-                          datePickerOfHome(0, context, rangeOfPeriod),
+                          SizedBox(
+                              width: 65.w,
+                              child:
+                                  datePickerOfHome(0, context, rangeOfPeriod)),
                           SizedBox(
                             width: mediaQueryWidth(context, 0.02),
                           ),
-                          datePickerOfHome(1, context, rangeOfPeriod)
+                          SizedBox(
+                              width: 65.w,
+                              child:
+                                  datePickerOfHome(1, context, rangeOfPeriod))
                         ],
                       ),
                     ),
               width: double.infinity,
-              height: mediaQuery(context, 0.04),
+              height: 40.h,
               color: lightColor,
             ),
             Stack(
@@ -204,7 +210,7 @@ class _HomePageState extends State<HomePage>
               children: [
                 Container(
                     height: mediaQuery(context, 0.44),
-                    decoration: roundedConrner(lightColor)),
+                    decoration: roundedConrnerOf(lightColor)),
                 Padding(
                   padding:
                       EdgeInsets.symmetric(vertical: 40.h, horizontal: 20.w),
@@ -226,7 +232,7 @@ class _HomePageState extends State<HomePage>
                       Container(
                         alignment: Alignment.center,
                         height: mediaQuery(context, 0.03),
-                        width: mediaQueryWidth(context, 0.29),
+                        width: mediaQueryWidth(context, 0.30),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(10.r),
@@ -235,7 +241,7 @@ class _HomePageState extends State<HomePage>
                         ),
                         child: Text(
                           dateInRange == now ? "Current Balance" : "Balance",
-                          style: TextStyle(fontSize: 14.sp, color: realWhite),
+                          style: TextStyle(fontSize: 12.sp, color: realWhite),
                         ),
                       )
                     ],
@@ -247,9 +253,11 @@ class _HomePageState extends State<HomePage>
                   right: 8.w,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       transactionContainer(context, 'Income', '₹ $totalIncome'),
+                      SizedBox(
+                        width: 6.w,
+                      ),
                       transactionContainer(
                         context,
                         'Expense',
@@ -290,20 +298,16 @@ class _HomePageState extends State<HomePage>
 
                   if (listOf.isEmpty) {
                     return Padding(
-                      padding: EdgeInsets.only(top: 60.h),
+                      padding: EdgeInsets.only(top: 30.h),
                       child: Center(
                         child: Column(
                           children: [
-                            Image.asset(
-                              "lib/global/images/Group 8.png",
-                              scale: 1.9,
-                              opacity: const AlwaysStoppedAnimation(100),
-                              color: themeColor,
-                            ),
+                            SvgPicture.asset("lib/global/images/Group.svg",
+                                width: 80.w),
                             Padding(
-                              padding: EdgeInsets.only(top: 10.h),
+                              padding: EdgeInsets.only(top: 13.h),
                               child: const Text(
-                                "No transaction Found",
+                                "Add transaction to see the list",
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -321,7 +325,6 @@ class _HomePageState extends State<HomePage>
                           reverse: true,
                           itemBuilder: (context, index) {
                             final list = listOf[index];
-
                             final listCategory =
                                 Hive.box<Categories>(db_Name).values.toList();
                             final categoryKey = getKeyCategory(
@@ -448,11 +451,11 @@ class _HomePageState extends State<HomePage>
       builder: (BuildContext context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.r)),
         // contentPadding: EdgeInsets.only(left: 20),
-        content: Text('You want to delete the transaction'),
+        content: const Text('You want to delete the transaction'),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, 'Cancel'),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -460,7 +463,7 @@ class _HomePageState extends State<HomePage>
               Navigator.pop(context, 'OK');
               setState(() {});
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -509,13 +512,11 @@ class _HomePageState extends State<HomePage>
       child: Container(
         alignment: Alignment.center,
         height: mediaQuery(context, 0.03),
-        width: mediaQueryWidth(context, 0.20),
+        width: 70.w,
         decoration: roundedConrnerHome(lightColor),
         child: Text(
           type == 0 ? rangeTextStart : rangeTextEnd,
-          style: TextStyle(
-            color: realBlack,
-          ),
+          style: TextStyle(color: realBlack, fontSize: 13.sp),
           textAlign: TextAlign.center,
         ),
       ),

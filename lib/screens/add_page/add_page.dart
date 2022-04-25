@@ -87,6 +87,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
     return SafeArea(
       top: widget.editValues.isEmpty ? true : false,
       child: Scaffold(
+        backgroundColor: realWhite,
         appBar: widget.editValues.isNotEmpty
             ? AppBar(
                 iconTheme: const IconThemeData(color: Colors.black),
@@ -258,8 +259,8 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                       })),
                           sizedBox(context),
                           initialValues.isEmpty
-                              ? Padding(
-                                  padding: EdgeInsets.only(bottom: 20.h),
+                              ? SizedBox(
+                                  height: 60.h,
                                   child: Row(
                                     children: [
                                       const Text("OR"),
@@ -284,7 +285,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                                 Icon(
                                                   Icons.add_box_rounded,
                                                   size: 15.sp,
-                                                  color: Colors.black,
+                                                  color: Colors.red,
                                                 ),
                                                 SizedBox(
                                                   width: mediaQueryWidth(
@@ -293,7 +294,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                                 const Text(
                                                   "Add Category",
                                                   style: TextStyle(
-                                                      color: Colors.black),
+                                                      color: Colors.red),
                                                 ),
                                               ],
                                             )),

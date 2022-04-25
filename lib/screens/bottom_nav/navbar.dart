@@ -33,16 +33,17 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: currentIndex < 2 ? homeScaffoldBackground : realWhite,
       body: screens[currentIndex],
       bottomNavigationBar: ClipRRect(
-        borderRadius: BorderRadius.circular(15.r),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
         child: BottomNavigationBar(
           backgroundColor: lightColor,
           type: BottomNavigationBarType.fixed,
           showUnselectedLabels: false,
           selectedItemColor: selectedItem,
           unselectedItemColor: realGrey,
-          iconSize: 26.sp,
+          iconSize: 25.sp,
           items: [
             navItem(Icons.home_sharp, "Home"),
             navItem(Icons.pie_chart, "Statistic"),

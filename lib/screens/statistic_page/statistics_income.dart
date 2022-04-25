@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
@@ -160,116 +161,115 @@ class _StatisticState extends State<StatisticIncome>
                                   ],
                                 ),
                         ),
-                        Padding(
-                          padding: _dateController.index <= 2
-                              ? EdgeInsets.symmetric(horizontal: 10.w)
-                              : EdgeInsets.only(right: 10.w),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(right: 70.w),
-                                  child: TabBar(
-                                    labelColor: Colors.black,
-                                    indicatorSize: TabBarIndicatorSize.tab,
-                                    indicator: circleDate(themeColor),
-                                    tabs: const [
-                                      Tab(text: 'D'),
-                                      Tab(text: 'M'),
-                                      Tab(text: 'Y'),
-                                      Tab(text: 'P'),
-                                    ],
-                                    controller: _dateController,
-                                  ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 15.w),
+                              child: SizedBox(
+                                width: 200.w,
+                                child: TabBar(
+                                  labelColor: Colors.black,
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  indicator: circleDate(themeColor),
+                                  tabs: const [
+                                    Tab(text: 'D'),
+                                    Tab(text: 'M'),
+                                    Tab(text: 'Y'),
+                                    Tab(text: 'P'),
+                                  ],
+                                  controller: _dateController,
                                 ),
                               ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Container(
-                                      child: _dateController.index == 0
-                                          ? InkWell(
-                                              onTap: () async {
-                                                monthPicker = await datePicker(
-                                                    context, 'dd', monthPicker);
+                            ),
+                            SizedBox(
+                              width: _dateController.index <= 2 ? 110.w : 54.w,
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
+                                    child: _dateController.index == 0
+                                        ? InkWell(
+                                            onTap: () async {
+                                              monthPicker = await datePicker(
+                                                  context, 'dd', monthPicker);
 
-                                                setState(() {});
-                                              },
-                                              child: datePickerOf(
-                                                  formateDay ?? "Day", context))
-                                          : _dateController.index == 1
-                                              ? InkWell(
-                                                  onTap: () async {
-                                                    monthPicker =
-                                                        await datePickerNew(
-                                                            context,
-                                                            _dateController,
-                                                            monthPicker);
-                                                    setState(() {});
-                                                  },
-                                                  child: datePickerOf(
-                                                      formattedMonth ?? 'Month',
-                                                      context))
-                                              : _dateController.index == 2
-                                                  ? InkWell(
-                                                      onTap: () async {
-                                                        monthPicker =
-                                                            await datePickerNew(
-                                                                context,
-                                                                _dateController,
-                                                                monthPicker);
-                                                        setState(() {});
-                                                      },
-                                                      child: datePickerOf(
-                                                          formattedYear ??
-                                                              "Year",
-                                                          context))
-                                                  : SizedBox(
-                                                      width: 120.w,
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          InkWell(
-                                                              onTap: () async {
-                                                                range =
-                                                                    await dateRangePicker(
-                                                                        context,
-                                                                        range);
-                                                                setState(() {});
-                                                              },
-                                                              child: datePickerOf(
-                                                                  rangeTextStart ??
-                                                                      "From",
-                                                                  context)),
-                                                          SizedBox(
-                                                            width:
-                                                                mediaQueryWidth(
-                                                                    context,
-                                                                    0.01),
-                                                          ),
-                                                          InkWell(
-                                                              onTap: () async {
-                                                                range =
-                                                                    await dateRangePicker(
-                                                                        context,
-                                                                        range);
-                                                                setState(() {});
-                                                              },
-                                                              child: datePickerOf(
-                                                                  rangeTextEnd ??
-                                                                      "To",
-                                                                  context))
-                                                        ],
+                                              setState(() {});
+                                            },
+                                            child: datePickerOf(
+                                                formateDay ?? "Day", context))
+                                        : _dateController.index == 1
+                                            ? InkWell(
+                                                onTap: () async {
+                                                  monthPicker =
+                                                      await datePickerNew(
+                                                          context,
+                                                          _dateController,
+                                                          monthPicker);
+                                                  setState(() {});
+                                                },
+                                                child: datePickerOf(
+                                                    formattedMonth ?? 'Month',
+                                                    context))
+                                            : _dateController.index == 2
+                                                ? InkWell(
+                                                    onTap: () async {
+                                                      monthPicker =
+                                                          await datePickerNew(
+                                                              context,
+                                                              _dateController,
+                                                              monthPicker);
+                                                      setState(() {});
+                                                    },
+                                                    child: datePickerOf(
+                                                        formattedYear ?? "Year",
+                                                        context))
+                                                : Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 50.w,
+                                                        child: InkWell(
+                                                            onTap: () async {
+                                                              range =
+                                                                  await dateRangePicker(
+                                                                      context,
+                                                                      range);
+                                                              setState(() {});
+                                                            },
+                                                            child: datePickerOf(
+                                                                rangeTextStart ??
+                                                                    "From",
+                                                                context)),
                                                       ),
-                                                    )),
-                                ],
-                              )
-                            ],
-                          ),
+                                                      SizedBox(
+                                                        width: mediaQueryWidth(
+                                                            context, 0.01),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 50.w,
+                                                        child: InkWell(
+                                                            onTap: () async {
+                                                              range =
+                                                                  await dateRangePicker(
+                                                                      context,
+                                                                      range);
+                                                              setState(() {});
+                                                            },
+                                                            child: datePickerOf(
+                                                                rangeTextEnd ??
+                                                                    "To",
+                                                                context)),
+                                                      )
+                                                    ],
+                                                  )),
+                              ],
+                            )
+                          ],
                         ),
                         const Divider(),
                         Padding(
@@ -295,18 +295,13 @@ class _StatisticState extends State<StatisticIncome>
                                     child: Center(
                                       child: Column(
                                         children: [
-                                          Image.asset(
-                                            "lib/global/images/Group 8.png",
-                                            scale: 1.9,
-                                            opacity:
-                                                const AlwaysStoppedAnimation(
-                                                    100),
-                                            color: themeColor,
-                                          ),
+                                          SvgPicture.asset(
+                                              "lib/global/images/Group.svg",
+                                              width: 80.w),
                                           Padding(
-                                            padding: EdgeInsets.only(top: 10.h),
+                                            padding: EdgeInsets.only(top: 13.h),
                                             child: const Text(
-                                              "No transaction Found",
+                                              "Add transaction to see the list",
                                               textAlign: TextAlign.center,
                                             ),
                                           ),
