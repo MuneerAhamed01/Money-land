@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
-import 'package:money_land/main.dart';
 
 import 'package:money_land/screens/category_page/assest/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';

@@ -181,7 +181,7 @@ gotoDelete(Categories categories) {
 gotoSearch(String value) {
   final hive = Hive.box<AddTransaction>(db_transaction);
   final hiveList = hive.values.toList();
-  print(hiveList);
+
   for (var i = 0; i < hiveList.length; i++) {
     if (hiveList[i].category!.category!.toLowerCase().trim() ==
         value.toLowerCase().trim()) {

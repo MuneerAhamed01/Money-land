@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';
-import 'package:money_land/themes/mediaquery/mediaquery.dart';
 
 import '../../../database/moneyland_model_class.dart';
 
@@ -85,7 +84,6 @@ List<AddTransaction> gotoFilter(
   List<AddTransaction> filteredList = [];
 
   if (controller.index <= 2) {
-    print("income ${list}");
     for (var i = 0; i < list.length; i++) {
       if (list[i].visible == false) {
         if (controller.index == 0) {

@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:money_land/screens/bottom_nav/navbar.dart';
-import 'package:money_land/themes/colors/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../onboarding_screen/onboarding_one.dart';

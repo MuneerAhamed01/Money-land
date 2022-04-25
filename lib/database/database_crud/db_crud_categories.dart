@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
-import 'package:money_land/main.dart';
 
+// ignore: non_constant_identifier_names
 String db_Name = "Categories";
 
 class CategoryDB {

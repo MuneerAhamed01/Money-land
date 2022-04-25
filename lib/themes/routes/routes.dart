@@ -11,7 +11,8 @@ class RouteGenerator {
 
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (context) => MyCustomSplashScreen());
+        return MaterialPageRoute(
+            builder: (context) => const MyCustomSplashScreen());
       case '/onboardingone':
         return MaterialPageRoute(builder: (context) => const OnBoardingOne());
 

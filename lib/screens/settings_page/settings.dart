@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,14 +34,13 @@ class _SettingsState extends State<Settings> {
   Future<bool> saveSwitchState(bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool("switchState", value);
-    print('Switch Value saved $value');
+
     return prefs.setBool("switchState", value);
   }
 
   Future<bool> getSwitchState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isSwitchedFT = prefs.getBool("switchState") ?? false;
-    print(isSwitchedFT);
 
     return isSwitchedFT;
   }
@@ -152,6 +149,12 @@ class _SettingsState extends State<Settings> {
     } else if (index == 1) {
     } else if (index == 2) {
     } else if (index == 3) {
+      const email = "muneerahamed6455@gmail.com";
+      const subject = "Write Your feedback Suggesions etc..";
+      const urlEmail = "mailto:$email?subject=$subject";
+      if (await canLaunch(urlEmail)) {
+        await launch(urlEmail);
+      }
     } else if (index == 4) {
       const url = "https://muneerahamed01.github.io/MuneerAhamed/";
       if (await canLaunch(url)) {
@@ -184,9 +187,7 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  onNotificationclicked(String payload) {
-    print(payload);
-  }
+  onNotificationclicked(String payload) {}
 }
 
 class AppSettings {

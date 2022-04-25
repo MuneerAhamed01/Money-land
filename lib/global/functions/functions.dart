@@ -28,8 +28,6 @@ increasingDate(TabController controller, DateTime dateTime) {
 
 Future<DateTimeRange> dateRangePicker(
     BuildContext context, DateTimeRange? dateOf) async {
-  print("date");
-
   DateTimeRange? date;
 
   final initialDate = DateTimeRange(
@@ -41,13 +39,10 @@ Future<DateTimeRange> dateRangePicker(
       firstDate: DateTime(DateTime.now().year - 5),
       lastDate: DateTime(DateTime.now().year + 5),
       initialDateRange: dateOf ?? initialDate);
-  print(date);
 
   if (date == null) {
-    print(initialDate);
     return initialDate;
   } else {
-    print(date);
     return date;
   }
 }
@@ -56,7 +51,6 @@ String formatPeriodStart(DateTimeRange? dateTimeRange) {
   if (dateTimeRange == null) {
     return 'From';
   } else {
-    print("objectoflalk");
     final formattedOf = DateFormat('dd MM yyyy').format(dateTimeRange.start);
     return formattedOf;
   }
