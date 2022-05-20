@@ -25,7 +25,8 @@ Widget datePickerOf(String type, BuildContext context) {
     decoration: roundedConrnerStaristic(lightColor),
     child: Text(
       type,
-      style: TextStyle(color: realBlack, fontSize: 11.5.sp),
+      style: TextStyle(
+          color: realBlack, fontSize: 10.sp, fontWeight: FontWeight.w500),
       textAlign: TextAlign.center,
     ),
   );

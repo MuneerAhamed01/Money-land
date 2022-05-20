@@ -51,6 +51,8 @@ dependencies:
   url_launcher: ^6.0.20
   path_provider: ^2.0.9
   introduction_screen: ^3.0.1
+  flutter_bloc: ^8.0.1
+  equatable: ^2.0.3
   
 
 dev_dependencies:

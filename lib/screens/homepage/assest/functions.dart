@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:money_land/logic/datetime/datetime_cubit.dart';
+import 'package:money_land/logic/tabcontroller/tabcontroller_cubit.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/themes/colors/colors.dart';
-
 import '../../../database/moneyland_model_class.dart';
 
 showDate(BuildContext context, TabController controller) {
@@ -16,6 +18,10 @@ showDate(BuildContext context, TabController controller) {
           child: Column(
             children: [
               TabBar(
+                onTap: (value) {
+                  context.read<TabcontrollerCubit>().changeIndex(value);
+                  context.read<DatetimeCubit>().onDate(controller);
+                },
                 controller: controller,
                 labelColor: realBlack,
                 indicatorSize: TabBarIndicatorSize.tab,
@@ -87,6 +93,7 @@ List<AddTransaction> gotoFilter(
     for (var i = 0; i < list.length; i++) {
       if (list[i].visible == false) {
         if (controller.index == 0) {
+          // print("object");
           if (list[i].date!.day == range.day &&
               list[i].date!.month == range.month &&
               list[i].date!.year == range.year) {
@@ -106,6 +113,7 @@ List<AddTransaction> gotoFilter(
     }
   } else {
     for (var i = 0; i < list.length; i++) {
+      print("objectFileter");
       if (list[i].visible == false) {
         final dateAfter = dateTimeRange.start.subtract(const Duration(days: 1));
         final dateBefore = dateTimeRange.end.add(const Duration(days: 1));

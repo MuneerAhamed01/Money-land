@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
-
 import 'package:money_land/screens/category_page/assest/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
-
 import 'tabs/expense_tab.dart';
 import 'tabs/income_tab.dart';
 
@@ -23,6 +20,7 @@ class _CategoryState extends State<Category>
   void initState() {
     _tabcontroller = TabController(length: 2, vsync: this, initialIndex: 0);
     _tabcontroller.addListener(handleIndex);
+    print("anja");
     super.initState();
   }
 
@@ -64,8 +62,11 @@ class _CategoryState extends State<Category>
             ? FloatingActionButton(
                 backgroundColor: themeColor,
                 onPressed: () {
-                  bottomSheet(context, "ADD Income", _tabcontroller.index,
-                      Creating.adding, CategoryType.income);
+                  bottomSheet(
+                      context: context,
+                      dbType: CategoryType.income,
+                      type: "Add Income",
+                      typeof: Creating.adding);
                   // addPage(box);
                 },
                 child: const Icon(
@@ -76,8 +77,11 @@ class _CategoryState extends State<Category>
             : FloatingActionButton(
                 backgroundColor: themeColor,
                 onPressed: () {
-                  bottomSheet(context, "ADD Expense", _tabcontroller.index,
-                      Creating.adding, CategoryType.expense);
+                  bottomSheet(
+                      context: context,
+                      dbType: CategoryType.expense,
+                      type: "Add Expense",
+                      typeof: Creating.adding);
                 },
                 child: const Icon(
                   Icons.add,

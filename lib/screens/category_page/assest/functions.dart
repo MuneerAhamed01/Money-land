@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
-
 import 'package:money_land/main.dart';
+import 'package:money_land/logic/category/category_bloc.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
 import 'package:money_land/screens/category_page/assest/styles.dart';
@@ -18,9 +19,13 @@ String typeOfText = '';
 String? category;
 final key = GlobalKey<FormState>();
 final box = Hive.box<Categories>('Category');
-bottomSheet(BuildContext context, String type, int index, Creating typeof,
-    CategoryType dbType,
-    {String? initial}) {
+bottomSheet(
+    {required BuildContext context,
+    required String type,
+    int? index,
+    required Creating typeof,
+    required CategoryType dbType,
+    String? initial}) {
   showModalBottomSheet(
     context: context,
     builder: (ctx) {
@@ -61,18 +66,24 @@ bottomSheet(BuildContext context, String type, int index, Creating typeof,
                   onPressed: () {
                     if (key.currentState!.validate()) {
                       if (typeof == Creating.adding) {
+                        final categoriesAdd =
+                            Categories(category: category, type: dbType);
+                        context
+                            .read<CategoryBloc>()
+                            .add(AddCategory(list: categoriesAdd));
+
                         Navigator.pop(ctx);
-                        db_Categories.addCategory(
-                            Categories(category: category, type: dbType));
-                        gotoSearch(category!);
                       } else {
-                        db_Categories.updateCatogry(index,
-                            Categories(category: category, type: dbType));
-                        final dbUpdate =
-                            Hive.box<Categories>(db_Name).get(index);
+                        final updateCategory =
+                            Categories(category: category, type: dbType);
+
+                        context.read<CategoryBloc>().add(
+                            EditCategory(key: index!, list: updateCategory));
+                        // final dbUpdate =
+                        //     Hive.box<Categories>(db_Name).get(index);
                         Navigator.pop(ctx);
 
-                        gotoEditCategory(initial!, dbUpdate!);
+                        // gotoEditCategory(initial!, dbUpdate!);
                       }
                     } else {
                       snackbarOf(ctx);
@@ -197,4 +208,16 @@ gotoSearch(String value) {
               type: hiveList[i].type));
     }
   }
+}
+
+List<Categories> seperateCategory(CategoryType type, List<Categories> list) {
+  List<Categories> incomeList = [];
+
+  for (var item in list) {
+    if (item.type == type) {
+      incomeList.add(item);
+    }
+  }
+
+  return incomeList;
 }

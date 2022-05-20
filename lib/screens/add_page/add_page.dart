@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/database/database_crud/db_crud_categories.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
+import 'package:money_land/logic/category/category_bloc.dart';
+import 'package:money_land/logic/transaction/transaction_bloc.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/screens/add_page/assest/styles.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
@@ -173,24 +176,32 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                             },
                           ),
                           sizedBox(context),
-                          SizedBox(
-                              width: double.infinity,
-                              child: widget.editValues.isEmpty
-                                  ? ValueListenableBuilder(
-                                      valueListenable: _tabControl.index == 0
-                                          ? db_Categories.income
-                                          : db_Categories.expense,
-                                      builder: (context,
-                                          List<Categories> categoryDowm, _) {
-                                        return DropdownButtonFormField<
-                                            Categories>(
+                          BlocBuilder<CategoryBloc, CategoryState>(
+                            builder: (context, state) {
+                              state as CategoryInitial;
+                              final splitCategoryExpense = seperateCategory(
+                                  CategoryType.expense, state.categoriesList);
+                                   final splitCategoryIncome = seperateCategory(
+                                  CategoryType.income, state.categoriesList);
+                              // final inc = seperateCategory(CategoryType.income, state.categoriesList);
+                              // final exp = seperateCategory(CategoryType.expense, state.categoriesList);
+                              return SizedBox(
+                                  width: double.infinity,
+                                  child: widget.editValues.isEmpty
+                                      ? DropdownButtonFormField<Categories>(
                                           value: _tabControl.index == 0
                                               ? itemsOf
                                               : itemsOn,
                                           hint: const Text("Select Category"),
                                           dropdownColor: Colors.white,
                                           decoration: dec(""),
-                                          items: categoryDowm
+                                          items: _tabControl.index == 0?splitCategoryIncome
+                                              .map((Categories item) =>
+                                                  DropdownMenuItem<Categories>(
+                                                    value: item,
+                                                    child: Text(item.category!),
+                                                  ))
+                                              .toList():splitCategoryExpense
                                               .map((Categories item) =>
                                                   DropdownMenuItem<Categories>(
                                                     value: item,
@@ -218,22 +229,24 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                               return null;
                                             }
                                           },
-                                        );
-                                      })
-                                  : ValueListenableBuilder(
-                                      valueListenable: initialValues["type"] ==
-                                              CategoryType.expense
-                                          ? db_Categories.expense
-                                          : db_Categories.income,
-                                      builder: (context,
-                                          List<Categories> categoryDowm, _) {
-                                        return DropdownButtonFormField<
-                                            Categories>(
+                                        )
+                                      : DropdownButtonFormField<Categories>(
                                           hint: const Text("Select Category"),
                                           value: itemIn,
                                           dropdownColor: Colors.white,
                                           decoration: dec(""),
-                                          items: categoryDowm
+                                          items: 
+
+                                          initialValues["type"] == CategoryType.income?
+                                          
+                                          
+                                          splitCategoryIncome
+                                              .map((Categories item) =>
+                                                  DropdownMenuItem<Categories>(
+                                                    value: item,
+                                                    child: Text(item.category!),
+                                                  ))
+                                              .toList(): splitCategoryExpense
                                               .map((Categories item) =>
                                                   DropdownMenuItem<Categories>(
                                                     value: item,
@@ -255,8 +268,9 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                               return null;
                                             }
                                           },
-                                        );
-                                      })),
+                                        ));
+                            },
+                          ),
                           sizedBox(context),
                           initialValues.isEmpty
                               ? SizedBox(
@@ -268,15 +282,13 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                         height: mediaQuery(context, 0.04),
                                         child: TextButton(
                                             onPressed: () {
-                                              // ignore: void_checks
-                                              return bottomSheet(
-                                                  context,
-                                                  _tabControl.index == 0
-                                                      ? "ADD Income"
-                                                      : "ADD Expense",
-                                                  _tabControl.index,
-                                                  Creating.adding,
-                                                  _tabControl.index == 0
+                                              bottomSheet(
+                                                  context: context,
+                                                  type: _tabControl.index == 0
+                                                      ? "Add Inocme"
+                                                      : "Add Expense",
+                                                  typeof: Creating.adding,
+                                                  dbType: _tabControl.index == 0
                                                       ? CategoryType.income
                                                       : CategoryType.expense);
                                             },
@@ -385,33 +397,44 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
               onPressed: () {
                 if (widget.editValues.isEmpty) {
                   if (_tabControl.index == 0) {
-                    db_trans.addTransactions(AddTransaction(
+                    final addTransactionIncome = AddTransaction(
                         date: initialDate ?? now,
                         category: categoryOf,
                         amount: amount,
                         notes: notes,
-                        type: CategoryType.income));
+                        type: CategoryType.income);
+                    context
+                        .read<TransactionBloc>()
+                        .add(AddTrans(transaction: addTransactionIncome));
+              
                   } else {
-                    db_trans.addTransactions(AddTransaction(
+                    final addTransactionExpense = AddTransaction(
                         date: initialDate ?? now,
                         category: categoryOf,
                         amount: amount,
                         notes: notes,
-                        type: CategoryType.expense));
+                        type: CategoryType.expense);
+                    context
+                        .read<TransactionBloc>()
+                        .add(AddTrans(transaction: addTransactionExpense));
+                 
                   }
                 } else {
-                  db_trans.updateTransaction(
-                      widget.editValues["key"],
-                      AddTransaction(
-                          date: initialDate ?? now,
-                          category: categoryOf,
-                          amount: amount,
-                          notes: notes,
-                          type: widget.editValues["type"]));
+                  final key = widget.editValues["key"];
+                  final listBody = AddTransaction(
+                      date: initialDate ?? now,
+                      category: categoryOf,
+                      amount: amount,
+                      notes: notes,
+                      type: widget.editValues["type"]);
+
+                  context
+                      .read<TransactionBloc>()
+                      .add(EditEvent(key: key, transaction: listBody));
                 }
 
                 Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (ctx) => const NavBar()),
+                    MaterialPageRoute(builder: (ctx) =>  NavBar()),
                     (route) => false);
               },
               child: const Text('OK'),

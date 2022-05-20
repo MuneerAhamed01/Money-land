@@ -62,7 +62,7 @@ class _MyCustomSplashScreenState extends State<MyCustomSplashScreen>
 
       if (moveOn == true) {
         setState(() {
-          Navigator.pushReplacement(context, PageTransition(const NavBar()));
+          Navigator.pushReplacement(context, PageTransition(NavBar()));
         });
       } else {
         setState(() {

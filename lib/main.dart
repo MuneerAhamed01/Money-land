@@ -3,8 +3,16 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_land/database/database_crud/db_crud_transaction.dart';
+import 'package:money_land/logic/bottomnav/bottomnavigation_cubit.dart';
+import 'package:money_land/logic/category/category_bloc.dart';
+import 'package:money_land/logic/datetime/datetime_cubit.dart';
+import 'package:money_land/logic/notifcation/notificaton_cubit.dart';
+import 'package:money_land/logic/statistic_change/statistic_change_cubit.dart';
+import 'package:money_land/logic/tabcontroller/tabcontroller_cubit.dart';
+import 'package:money_land/logic/transaction/transaction_bloc.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/routes/routes.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -15,6 +23,7 @@ import 'package:month_year_picker/month_year_picker.dart';
 final db_trans = TransactionDB();
 final db_Categories = CategoryDB();
 final db_transaction = 'Transaction';
+
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,23 +67,34 @@ class MyApp extends StatelessWidget {
         // splitScreenMode: true,
         minTextAdapt: false,
         builder: (context) {
-          return MaterialApp(
-            builder: (context, child) => MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: 0.8),
-                child: child!),
-            useInheritedMediaQuery: true,
-            localizationsDelegates: const [
-              MonthYearPickerLocalizations.delegate,
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => CategoryBloc()),
+              BlocProvider(create: (context) => TransactionBloc()),
+              BlocProvider(create: (context) => DatetimeCubit()),
+              BlocProvider(create: (context) => TabcontrollerCubit()),
+              BlocProvider(create: (context) => BottomnavigationCubit()),
+              BlocProvider(create: (context) => StatisticChangeCubit()),
+              BlocProvider(create: (context) => NotificatonCubit()),
             ],
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              textTheme: TextTheme(
-                  bodyText2: TextStyle(fontSize: 14.sp),
-                  button: TextStyle(fontSize: 13.sp)),
-              errorColor: Colors.grey,
-              canvasColor: transparent,
+            child: MaterialApp(
+              builder: (context, child) => MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaleFactor: 0.8),
+                  child: child!),
+              useInheritedMediaQuery: true,
+              localizationsDelegates: const [
+                MonthYearPickerLocalizations.delegate,
+              ],
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                textTheme: TextTheme(
+                    bodyText2: TextStyle(fontSize: 14.sp),
+                    button: TextStyle(fontSize: 13.sp)),
+                errorColor: Colors.grey,
+                canvasColor: transparent,
+              ),
+              onGenerateRoute: RouteGenerator.generateRoute,
             ),
-            onGenerateRoute: RouteGenerator.generateRoute,
           );
         });
   }

@@ -17,7 +17,7 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (context) => const OnBoardingOne());
 
       case '/home':
-        return MaterialPageRoute(builder: (context) => const NavBar());
+        return MaterialPageRoute(builder: (context) =>  NavBar());
       case '/editscreen':
         final args = settings.arguments as Map;
         return MaterialPageRoute(
@@ -25,7 +25,7 @@ class RouteGenerator {
                   editValues: args,
                 ));
       default:
-        return MaterialPageRoute(builder: (context) => const NavBar());
+        return MaterialPageRoute(builder: (context) =>  NavBar());
     }
   }
 }

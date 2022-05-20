@@ -1,9 +1,11 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
+import 'package:money_land/logic/notifcation/notificaton_cubit.dart';
 import 'package:money_land/main.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,28 +90,38 @@ class _SettingsState extends State<Settings> {
       body: ListView.builder(
         itemBuilder: (context, index) {
           return index == 0
-              ? SwitchListTile(
-                  value: isSwitchedFT,
-                  activeTrackColor: themeColor,
-                  activeColor: lightColor,
-                  onChanged: (value) async {
-                    setState(() {});
-                    isSwitchedFT = value;
-                    saveSwitchState(value);
-                    gotoSettings(0, value: value);
+              ? BlocBuilder<NotificatonCubit, NotificatonState>(
+                  builder: (context, state) {
+                    return SwitchListTile(
+                      value: state is ChangeListTail ? state.value : true,
+                      activeTrackColor: themeColor,
+                      activeColor: lightColor,
+                      onChanged: (value) async {
+                        context.read<NotificatonCubit>().changeOf(value);
+                        saveSwitchState(value);
+                        gotoSettings(0,
+                            value: value,
+                            expense: state is NotificationInitial
+                                ? state.totalExp
+                                : 0,
+                            income: state is NotificationInitial
+                                ? state.totalInc
+                                : 0);
+                      },
+                      title: Row(
+                        children: [
+                          Icon(settings[index].icon),
+                          SizedBox(
+                            width: 30.w,
+                          ),
+                          Text(
+                            "${settings[index].title}",
+                            style: TextStyle(fontSize: 20.sp),
+                          ),
+                        ],
+                      ),
+                    );
                   },
-                  title: Row(
-                    children: [
-                      Icon(settings[index].icon),
-                      SizedBox(
-                        width: 30.w,
-                      ),
-                      Text(
-                        "${settings[index].title}",
-                        style: TextStyle(fontSize: 20.sp),
-                      ),
-                    ],
-                  ),
                 )
               : ListTile(
                   textColor: realBlack,
@@ -129,15 +141,16 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  gotoSettings(int index, {bool? value}) async {
+  gotoSettings(int index,
+      {bool? value, double? expense, double? income}) async {
     if (index == 0) {
-      if (isSwitchedFT == true) {
+      if (value == true) {
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: 0,
             channelKey: "Channel_key",
-            title: "Balance : ${totalIncome! - totalExp!}",
-            body: "Income : $totalIncome  Expesne : $totalExp",
+            title: "Balance : ${income! - expense!}",
+            body: "Income : $income  Expesne : $expense",
             fullScreenIntent: true,
             displayOnBackground: true,
             notificationLayout: NotificationLayout.Inbox,
@@ -149,17 +162,13 @@ class _SettingsState extends State<Settings> {
     } else if (index == 1) {
     } else if (index == 2) {
     } else if (index == 3) {
-      const email = "muneerahamed6455@gmail.com";
-      const subject = "Write Your feedback Suggesions etc..";
-      const urlEmail = "mailto:$email?subject=$subject";
-      if (await canLaunch(urlEmail)) {
-        await launch(urlEmail);
-      }
+      final email = Uri(path: "muneerahamed6455@gmail.com");
+
+      await launchUrl(email);
     } else if (index == 4) {
-      const url = "https://muneerahamed01.github.io/MuneerAhamed/";
-      if (await canLaunch(url)) {
-        await launch(url);
-      }
+      final url = Uri(path: "https://muneerahamed01.github.io/MuneerAhamed/");
+
+      await launchUrl(url);
     } else {
       showDialog<String>(
         context: context,

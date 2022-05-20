@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
-import 'package:money_land/main.dart';
+import 'package:money_land/logic/transaction/transaction_bloc.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/statistic_page/assests/functions.dart';
 import 'package:money_land/themes/colors/colors.dart';
@@ -12,6 +13,8 @@ import 'package:money_land/themes/mediaquery/mediaquery.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../database/database_crud/db_crud_categories.dart';
 import '../../global/functions/functions.dart';
+import '../../logic/datetime/datetime_cubit.dart';
+import '../../logic/tabcontroller/tabcontroller_cubit.dart';
 import '../homepage/assest/functions.dart';
 import '../homepage/assest/widgets.dart';
 import 'assests/widgets.dart';
@@ -52,41 +55,10 @@ class _StatisticState extends State<Statistic>
 
   DateTime monthPicker = DateTime.now();
 
-  String? formattedMonth;
-  String? formattedYear;
-  String? formateDay;
-  DateTimeRange range = initialDate;
-  String? rangeTextStart;
-  String? rangeTextEnd;
-  List<AddTransaction>? trans;
-  // MediaQueryPadding query = MediaQueryPadding();
-  // final query = MediaQueryCostom()
+
 
   @override
   Widget build(BuildContext context) {
-    List<AddTransaction> transaction =
-        Hive.box<AddTransaction>(db_transaction).values.toList();
-    final List<AddTransaction> expense =
-        splitTransaction(transaction, CategoryType.expense);
-    final List<AddTransaction> filteredList = gotoFilter(
-        range: monthPicker,
-        controller: _dateController,
-        list: expense,
-        dateTimeRange: range);
-    List<Data> connectedList = chartViewList(filteredList);
-
-    // trans = filteredList;
-
-    formattedMonth = DateFormat('MMM').format(monthPicker);
-    formateDay = DateFormat('dd-MM-yy').format(monthPicker);
-    formattedYear = DateFormat('yyyy').format(monthPicker);
-
-    rangeTextStart = DateFormat('dd-MM-yy').format(range.start);
-    rangeTextEnd = DateFormat('dd-MM-yy').format(range.end);
-
-    final double totalExp =
-        totalTransaction(filteredList, CategoryType.expense);
-
     return SafeArea(
       child: ScrollConfiguration(
         behavior: const ScrollBehavior(),
@@ -94,242 +66,252 @@ class _StatisticState extends State<Statistic>
             backgroundColor: statisticScaffoldBackground,
             extendBody: true,
             body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    color: realWhite,
-                    height: mediaQuery(context, 0.18),
-                    width: double.infinity,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15.w),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "My Spendings :",
-                              style: boldText(22.sp),
-                            ),
-                            SizedBox(
-                              height: mediaQuery(context, 0.02),
-                            ),
-                            Text(
-                              "₹ $totalExp",
-                              style: boldText(60.sp),
-                            )
-                          ],
+              child: Builder(builder: (context) {
+                context.read<DatetimeCubit>().onDate(_dateController);
+                context.watch<TabcontrollerCubit>().state;
+                final buildList = context.watch<TransactionBloc>().state;
+                final dateList = context.watch<DatetimeCubit>().state;
+
+                buildList as TransactionInitial;
+                final List<AddTransaction> expense =
+                    splitTransaction(buildList.list, CategoryType.expense);
+                final List<AddTransaction> filteredList = gotoFilter(
+                    range: dateList.dateTime!,
+                    controller: _dateController,
+                    list: expense,
+                    dateTimeRange: dateList.dateTimeRange!);
+                List<Data> connectedList = chartViewList(filteredList);
+                final double totalExp =
+                    totalTransaction(filteredList, CategoryType.expense);
+                return Column(
+                  children: [
+                    Container(
+                      color: realWhite,
+                      height: mediaQuery(context, 0.18),
+                      width: double.infinity,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15.w),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "My Spendings :",
+                                style: boldText(22.sp),
+                              ),
+                              SizedBox(
+                                height: mediaQuery(context, 0.02),
+                              ),
+                              Text(
+                                "₹ $totalExp",
+                                style: boldText(60.sp),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Container(
-                    decoration:
-                        roundedConrnerStatic(statisticPieChartBackground),
-                    // height: mediaQuery(context, 1),
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: mediaQuery(context, 0.35),
-                          width: double.infinity,
-                          child: filteredList.isEmpty
-                              ? const Center(child: Text("No Data Available"))
-                              : SfCircularChart(
-                                  palette: [
-                                    themeColor,
-                                    Colors.green,
-                                    Colors.amber,
-                                    const Color.fromARGB(255, 245, 133, 133),
-                                    const Color.fromRGBO(116, 180, 155, 1),
-                                    const Color.fromRGBO(0, 168, 181, 1),
-                                    const Color.fromRGBO(73, 76, 162, 1),
-                                    const Color.fromRGBO(255, 205, 96, 1),
-                                    const Color.fromRGBO(255, 240, 219, 1),
-                                    const Color.fromRGBO(238, 238, 238, 1)
-                                  ],
-                                  legend: Legend(
-                                    isVisible: true,
-                                    position: LegendPosition.bottom,
+                    Container(
+                      decoration:
+                          roundedConrnerStatic(statisticPieChartBackground),
+                      // height: mediaQuery(context, 1),
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: mediaQuery(context, 0.35),
+                            width: double.infinity,
+                            child: filteredList.isEmpty
+                                ? const Center(child: Text("No Data Available"))
+                                : SfCircularChart(
+                                    palette: [
+                                      themeColor,
+                                      Colors.green,
+                                      Colors.amber,
+                                      const Color.fromARGB(255, 245, 133, 133),
+                                      const Color.fromRGBO(116, 180, 155, 1),
+                                      const Color.fromRGBO(0, 168, 181, 1),
+                                      const Color.fromRGBO(73, 76, 162, 1),
+                                      const Color.fromRGBO(255, 205, 96, 1),
+                                      const Color.fromRGBO(255, 240, 219, 1),
+                                      const Color.fromRGBO(238, 238, 238, 1)
+                                    ],
+                                    legend: Legend(
+                                      isVisible: true,
+                                      position: LegendPosition.bottom,
+                                    ),
+                                    series: <CircularSeries>[
+                                      DoughnutSeries<Data, String>(
+                                        dataLabelSettings:
+                                            const DataLabelSettings(
+                                                isVisible: true,
+                                                labelPosition:
+                                                    ChartDataLabelPosition
+                                                        .outside),
+                                        dataSource: connectedList,
+                                        xValueMapper: (Data data, _) =>
+                                            data.categories,
+                                        yValueMapper: (Data data, _) =>
+                                            data.amount,
+                                      )
+                                    ],
                                   ),
-                                  series: <CircularSeries>[
-                                    DoughnutSeries<Data, String>(
-                                      dataLabelSettings:
-                                          const DataLabelSettings(
-                                              isVisible: true,
-                                              labelPosition:
-                                                  ChartDataLabelPosition
-                                                      .outside),
-                                      dataSource: connectedList,
-                                      xValueMapper: (Data data, _) =>
-                                          data.categories,
-                                      yValueMapper: (Data data, _) =>
-                                          data.amount,
-                                    )
-                                  ],
-                                ),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 15.w),
-                              child: SizedBox(
-                                width: 200.w,
-                                child: TabBar(
-                                  labelColor: Colors.black,
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  indicator: circleDate(themeColor),
-                                  tabs: const [
-                                    Tab(text: 'D'),
-                                    Tab(text: 'M'),
-                                    Tab(text: 'Y'),
-                                    Tab(text: 'P'),
-                                  ],
-                                  controller: _dateController,
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 15.w),
+                                child: SizedBox(
+                                  width: 200.w,
+                                  child: TabBar(
+                                    onTap: (value) {
+                                      context
+                                          .read<TabcontrollerCubit>()
+                                          .changeIndex(value);
+                                      context
+                                          .read<DatetimeCubit>()
+                                          .onDate(_dateController);
+                                    },
+                                    labelColor: Colors.black,
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    indicator: circleDate(themeColor),
+                                    tabs: const [
+                                      Tab(text: 'D'),
+                                      Tab(text: 'M'),
+                                      Tab(text: 'Y'),
+                                      Tab(text: 'P'),
+                                    ],
+                                    controller: _dateController,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              width: _dateController.index <= 2 ? 110.w : 54.w,
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                    child: _dateController.index == 0
-                                        ? InkWell(
-                                            onTap: () async {
-                                              monthPicker = await datePicker(
-                                                  context, 'dd', monthPicker);
-
-                                              setState(() {});
-                                            },
-                                            child: datePickerOf(
-                                                formateDay ?? "Day", context))
-                                        : _dateController.index == 1
-                                            ? InkWell(
-                                                onTap: () async {
-                                                  monthPicker =
-                                                      await datePickerNew(
-                                                          context,
-                                                          _dateController,
-                                                          monthPicker);
-                                                  setState(() {});
-                                                },
-                                                child: datePickerOf(
-                                                    formattedMonth ?? 'Month',
-                                                    context))
-                                            : _dateController.index == 2
-                                                ? InkWell(
-                                                    onTap: () async {
-                                                      monthPicker =
-                                                          await datePickerNew(
-                                                              context,
-                                                              _dateController,
-                                                              monthPicker);
-                                                      setState(() {});
-                                                    },
-                                                    child: datePickerOf(
-                                                        formattedYear ?? "Year",
-                                                        context))
-                                                : SizedBox(
-                                                    width: 120.w,
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        SizedBox(
-                                                          width: 50.w,
-                                                          child: InkWell(
-                                                              onTap: () async {
-                                                                range =
-                                                                    await dateRangePicker(
-                                                                        context,
-                                                                        range);
-                                                                setState(() {});
-                                                              },
-                                                              child: datePickerOf(
-                                                                  rangeTextStart ??
-                                                                      "From",
-                                                                  context)),
-                                                        ),
-                                                        SizedBox(
-                                                          width:
-                                                              mediaQueryWidth(
-                                                                  context,
-                                                                  0.01),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 50.w,
-                                                          child: InkWell(
-                                                              onTap: () async {
-                                                                range =
-                                                                    await dateRangePicker(
-                                                                        context,
-                                                                        range);
-                                                                setState(() {});
-                                                              },
-                                                              child: datePickerOf(
-                                                                  rangeTextEnd ??
-                                                                      "To",
-                                                                  context)),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  )),
-                              ],
-                            )
-                          ],
-                        ),
-                        const Divider(),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5.h),
-                          child: ValueListenableBuilder(
-                              valueListenable:
-                                  Hive.box<AddTransaction>(db_transaction)
-                                      .listenable(),
-                              builder: (context, Box<AddTransaction> box, _) {
-                                final List<AddTransaction> list =
-                                    box.values.toList();
-                                final List<AddTransaction> expense =
-                                    splitTransaction(
-                                        list, CategoryType.expense);
-
-                                final filteredList = gotoFilter(
-                                    controller: _dateController,
-                                    dateTimeRange: range,
-                                    list: expense,
-                                    range: monthPicker);
-
-                                if (filteredList.isEmpty) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(top: 60.h),
-                                    child: Center(
-                                      child: Column(
-                                        children: [
-                                          SvgPicture.asset(
-                                              "lib/global/images/Group.svg",
-                                              width: 80.w),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 13.h),
-                                            child: const Text(
-                                              "Add transaction to see the list",
-                                              textAlign: TextAlign.center,
+                              SizedBox(
+                                width:
+                                    _dateController.index <= 2 ? 110.w : 54.w,
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                      child: _dateController.index == 0
+                                          ? InkWell(
+                                              onTap: () async {
+                                                context
+                                                    .read<DatetimeCubit>()
+                                                    .datePickerOn(context,
+                                                        _dateController);
+                                              },
+                                              child: datePickerOf(
+                                                  dateList.formatedDate!,
+                                                  context))
+                                          : _dateController.index == 1
+                                              ? InkWell(
+                                                  onTap: () async {
+                                                    context
+                                                        .read<DatetimeCubit>()
+                                                        .datePickerOn(context,
+                                                            _dateController);
+                                                  },
+                                                  child: datePickerOf(
+                                                      dateList.formatedDate!,
+                                                      context))
+                                              : _dateController.index == 2
+                                                  ? InkWell(
+                                                      onTap: () async {
+                                                        context
+                                                            .read<
+                                                                DatetimeCubit>()
+                                                            .datePickerOn(
+                                                                context,
+                                                                _dateController);
+                                                      },
+                                                      child: datePickerOf(
+                                                          dateList
+                                                              .formatedDate!,
+                                                          context))
+                                                  : SizedBox(
+                                                      width: 120.w,
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          SizedBox(
+                                                            width: 50.w,
+                                                            child: InkWell(
+                                                                onTap:
+                                                                    () async {
+                                                                  context
+                                                                      .read<
+                                                                          DatetimeCubit>()
+                                                                      .dateRangPicker(
+                                                                          context);
+                                                                },
+                                                                child: datePickerOf(
+                                                                    dateList
+                                                                        .formatedDateStart!,
+                                                                    context)),
+                                                          ),
+                                                          SizedBox(
+                                                            width:
+                                                                mediaQueryWidth(
+                                                                    context,
+                                                                    0.01),
+                                                          ),
+                                                          SizedBox(
+                                                            width: 50.w,
+                                                            child: InkWell(
+                                                                onTap:
+                                                                    () async {
+                                                                  context
+                                                                      .read<
+                                                                          DatetimeCubit>()
+                                                                      .dateRangPicker(
+                                                                          context);
+                                                                },
+                                                                child: datePickerOf(
+                                                                    dateList
+                                                                        .formatedDateEnd!,
+                                                                    context)),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    )),
+                                ],
+                              )
+                            ],
+                          ),
+                          const Divider(),
+                          Padding(
+                              padding: EdgeInsets.only(top: 5.h),
+                              child: filteredList.isEmpty
+                                  ? Padding(
+                                      padding: EdgeInsets.only(top: 60.h),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            SvgPicture.asset(
+                                                "lib/global/images/Group.svg",
+                                                width: 80.w),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 13.h),
+                                              child: const Text(
+                                                "Add transaction to see the list",
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return ListView.separated(
+                                          ],
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                        ),
+                                      ))
+                                  : ListView.separated(
                                       controller: ScrollController(),
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
@@ -446,32 +428,17 @@ class _StatisticState extends State<Statistic>
                                             color: const Color.fromARGB(
                                                 255, 251, 245, 245),
                                           ),
-                                      itemCount: filteredList.length);
-                                }
-                              }),
-                        )
-                      ],
+                                      itemCount: filteredList.length))
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
             )),
       ),
     );
   }
-
-  // List<Datas> chartView() {
-  //   final List<Datas> charts = [
-  //    for (var i = 0; i < ; i++) {
-
-  //    }
-  //   ];
-  //   return charts;
-  // }
-
-  // changeTap() {
-  //   ontap.value = _dateController.index;
-  // }
 
   alertDialog(int key, BuildContext context) {
     showDialog<String>(
@@ -487,9 +454,8 @@ class _StatisticState extends State<Statistic>
           ),
           TextButton(
             onPressed: () {
-              db_trans.deleteTransaction(key);
+              context.read<TransactionBloc>().add(DeleteTransaction(key: key));
               Navigator.pop(context, 'OK');
-              setState(() {});
             },
             child: const Text('OK'),
           ),
