@@ -179,12 +179,8 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                           BlocBuilder<CategoryBloc, CategoryState>(
                             builder: (context, state) {
                               state as CategoryInitial;
-                              final splitCategoryExpense = seperateCategory(
-                                  CategoryType.expense, state.categoriesList);
-                                   final splitCategoryIncome = seperateCategory(
-                                  CategoryType.income, state.categoriesList);
-                              // final inc = seperateCategory(CategoryType.income, state.categoriesList);
-                              // final exp = seperateCategory(CategoryType.expense, state.categoriesList);
+                              final splitCategoryExpense = state.expense;
+                              final splitCategoryIncome = state.income;
                               return SizedBox(
                                   width: double.infinity,
                                   child: widget.editValues.isEmpty
@@ -195,19 +191,25 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                           hint: const Text("Select Category"),
                                           dropdownColor: Colors.white,
                                           decoration: dec(""),
-                                          items: _tabControl.index == 0?splitCategoryIncome
-                                              .map((Categories item) =>
-                                                  DropdownMenuItem<Categories>(
-                                                    value: item,
-                                                    child: Text(item.category!),
-                                                  ))
-                                              .toList():splitCategoryExpense
-                                              .map((Categories item) =>
-                                                  DropdownMenuItem<Categories>(
-                                                    value: item,
-                                                    child: Text(item.category!),
-                                                  ))
-                                              .toList(),
+                                          items: _tabControl.index == 0
+                                              ? splitCategoryIncome
+                                                  .map((Categories item) =>
+                                                      DropdownMenuItem<
+                                                          Categories>(
+                                                        value: item,
+                                                        child: Text(
+                                                            item.category!),
+                                                      ))
+                                                  .toList()
+                                              : splitCategoryExpense
+                                                  .map((Categories item) =>
+                                                      DropdownMenuItem<
+                                                          Categories>(
+                                                        value: item,
+                                                        child: Text(
+                                                            item.category!),
+                                                      ))
+                                                  .toList(),
                                           onChanged: (item) {
                                             if (_tabControl.index == 0) {
                                               setState(() {
@@ -235,24 +237,26 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                                           value: itemIn,
                                           dropdownColor: Colors.white,
                                           decoration: dec(""),
-                                          items: 
-
-                                          initialValues["type"] == CategoryType.income?
-                                          
-                                          
-                                          splitCategoryIncome
-                                              .map((Categories item) =>
-                                                  DropdownMenuItem<Categories>(
-                                                    value: item,
-                                                    child: Text(item.category!),
-                                                  ))
-                                              .toList(): splitCategoryExpense
-                                              .map((Categories item) =>
-                                                  DropdownMenuItem<Categories>(
-                                                    value: item,
-                                                    child: Text(item.category!),
-                                                  ))
-                                              .toList(),
+                                          items: initialValues["type"] ==
+                                                  CategoryType.income
+                                              ? splitCategoryIncome
+                                                  .map((Categories item) =>
+                                                      DropdownMenuItem<
+                                                          Categories>(
+                                                        value: item,
+                                                        child: Text(
+                                                            item.category!),
+                                                      ))
+                                                  .toList()
+                                              : splitCategoryExpense
+                                                  .map((Categories item) =>
+                                                      DropdownMenuItem<
+                                                          Categories>(
+                                                        value: item,
+                                                        child: Text(
+                                                            item.category!),
+                                                      ))
+                                                  .toList(),
                                           onChanged: (item) {
                                             setState(() {
                                               itemIn = item!;
@@ -406,7 +410,6 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                     context
                         .read<TransactionBloc>()
                         .add(AddTrans(transaction: addTransactionIncome));
-              
                   } else {
                     final addTransactionExpense = AddTransaction(
                         date: initialDate ?? now,
@@ -417,7 +420,6 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                     context
                         .read<TransactionBloc>()
                         .add(AddTrans(transaction: addTransactionExpense));
-                 
                   }
                 } else {
                   final key = widget.editValues["key"];
@@ -434,7 +436,7 @@ class _AddPageState extends State<AddPage> with SingleTickerProviderStateMixin {
                 }
 
                 Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (ctx) =>  NavBar()),
+                    MaterialPageRoute(builder: (ctx) => NavBar()),
                     (route) => false);
               },
               child: const Text('OK'),

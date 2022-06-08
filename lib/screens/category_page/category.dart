@@ -20,7 +20,7 @@ class _CategoryState extends State<Category>
   void initState() {
     _tabcontroller = TabController(length: 2, vsync: this, initialIndex: 0);
     _tabcontroller.addListener(handleIndex);
-    print("anja");
+    
     super.initState();
   }
 

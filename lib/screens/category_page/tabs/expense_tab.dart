@@ -11,6 +11,8 @@ import 'package:money_land/logic/category/category_bloc.dart';
 
 class Expense extends StatelessWidget {
   const Expense({Key? key}) : super(key: key);
+  
+
   @override
 
   // int? accesKey;
@@ -22,8 +24,7 @@ class Expense extends StatelessWidget {
           BlocBuilder<CategoryBloc, CategoryState>(builder: (context, state) {
         state as CategoryInitial;
 
-        final exp =
-            seperateCategory(CategoryType.expense, state.categoriesList);
+        final exp = state.expense;
 
         return exp.isEmpty
             ? Center(
@@ -96,9 +97,9 @@ class Expense extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              context.read<CategoryBloc>().add(DeleteCategory(key: delete.key));
+              context.read<CategoryBloc>().add(DeleteCategory(key: delete.key,name: delete.category!));
               Navigator.pop(context);
-            }, 
+            },
             child: const Text('OK'),
           ),
         ],

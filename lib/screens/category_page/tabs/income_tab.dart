@@ -11,7 +11,7 @@ import 'package:money_land/screens/category_page/assest/functions.dart';
 import '../../../database/database_crud/db_crud_categories.dart';
 
 class Income extends StatelessWidget {
- const Income({Key? key}) : super(key: key);
+  const Income({Key? key}) : super(key: key);
 
   @override
 //  late int? accesKey;
@@ -22,16 +22,16 @@ class Income extends StatelessWidget {
       child:
           BlocBuilder<CategoryBloc, CategoryState>(builder: (context, state) {
         state as CategoryInitial;
-        final income = state.categoriesList;
-        final inc = seperateCategory(CategoryType.income, income);
+        
+        final inc = state.income;
         return inc.isEmpty
             ? Center(
                 child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center, 
                 children: [
                   SvgPicture.asset(
                     "lib/global/images/sentiment_very_dissatisfied.svg",
-                    color: Colors.grey,
+                    color: Colors.grey, 
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 20.h),
@@ -56,8 +56,13 @@ class Income extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             onPressed: () {
-                            
-                              bottomSheet(context: context,dbType: CategoryType.income,type: "Edit Income",typeof:Creating.editing,index: inc[index].key,initial: inc[index].category);
+                              bottomSheet(
+                                  context: context,
+                                  dbType: CategoryType.income,
+                                  type: "Edit Income",
+                                  typeof: Creating.editing,
+                                  index: inc[index].key,
+                                  initial: inc[index].category);
                             },
                           ),
                           IconButton(
@@ -82,16 +87,15 @@ class Income extends StatelessWidget {
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: const Text(' Are you sure'),
-        content: const Text(
-            'You Want to delete the item? '),
+        content: const Text('You Want to delete the item? '),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: ()  {
-              context.read<CategoryBloc>().add(DeleteCategory(key: delete.key));
+            onPressed: () {
+              context.read<CategoryBloc>().add(DeleteCategory(key: delete.key,name: delete.category!));
               Navigator.pop(context);
             },
             child: const Text('OK'),

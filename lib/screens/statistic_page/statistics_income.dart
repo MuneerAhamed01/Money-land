@@ -40,36 +40,12 @@ class _StatisticState extends State<StatisticIncome>
   void initState() {
     // chartsof = chartView();
     _dateController = TabController(length: 4, vsync: this, initialIndex: 1);
-    _dateController.addListener(setting);
 
     super.initState();
   }
 
-  setting() {
-    setState(() {});
-  }
-
-  ValueNotifier<int> ontap = ValueNotifier(0);
-  String day = "01";
-  String month = 'month';
-  String year = "year";
-  DateTime monthPicker = DateTime.now();
-  String? formattedMonth;
-  String? formattedYear;
-  String? formateDay;
-  DateTimeRange range = initialDate;
-  String? rangeTextStart;
-  String? rangeTextEnd;
-
   @override
   Widget build(BuildContext context) {
-    formattedMonth = DateFormat('MMM').format(monthPicker);
-    formateDay = DateFormat('dd-MM-yy').format(monthPicker);
-    formattedYear = DateFormat('yyyy').format(monthPicker);
-
-    rangeTextStart = DateFormat('dd-MM-yy').format(range.start);
-    rangeTextEnd = DateFormat('dd-MM-yy').format(range.end);
-
     return SafeArea(
       child: ScrollConfiguration(
         behavior: const ScrollBehavior(),
@@ -81,18 +57,14 @@ class _StatisticState extends State<StatisticIncome>
                 context.watch<TabcontrollerCubit>().state;
                 final buildList = context.watch<TransactionBloc>().state;
                 final dateList = context.watch<DatetimeCubit>().state;
-                buildList as TransactionInitial;
-                final List<AddTransaction> income =
-                    splitTransaction(buildList.list, CategoryType.income);
-                final filteredList = gotoFilter(
-                    range: monthPicker,
-                    controller: _dateController,
-                    list: income,
-                    dateTimeRange: dateList.dateTimeRange!);
-                List<Data> connectedList = chartViewList(filteredList);
+                context.read<TransactionBloc>().add(GetFilteredList(
+                    tabIndex: _dateController.index,
+                    dateTime: dateList.dateTime!,
+                    dateTimeRange: dateList.dateTimeRange!));
 
-                final double totalIncome =
-                    totalTransaction(filteredList, CategoryType.income);
+                //
+                final filteredList = buildList.income;
+                List<Data> connectedList = chartViewList(filteredList);
 
                 return Column(
                   children: [
@@ -114,7 +86,7 @@ class _StatisticState extends State<StatisticIncome>
                                 height: mediaQuery(context, 0.02),
                               ),
                               Text(
-                                "₹ $totalIncome",
+                                "₹ ${buildList.incomeAmunt}",
                                 style: boldText(60),
                               )
                             ],
@@ -178,6 +150,14 @@ class _StatisticState extends State<StatisticIncome>
                                 child: SizedBox(
                                   width: 200.w,
                                   child: TabBar(
+                                    onTap: (value) {
+                                      context
+                                          .read<TabcontrollerCubit>()
+                                          .changeIndex(value);
+                                      context
+                                          .read<DatetimeCubit>()
+                                          .onDate(_dateController);
+                                    },
                                     labelColor: Colors.black,
                                     indicatorSize: TabBarIndicatorSize.tab,
                                     indicator: circleDate(themeColor),
@@ -290,167 +270,149 @@ class _StatisticState extends State<StatisticIncome>
                           const Divider(),
                           Padding(
                               padding: EdgeInsets.only(top: 10.h),
-                              child:
-                                  // final List<AddTransaction> list =
-                                  //     box.values.toList();
-                                  // final List<AddTransaction> income =
-                                  //     splitTransaction(list, CategoryType.income);
-                                  // final filteredList = gotoFilter(
-                                  //     controller: _dateController,
-                                  //     dateTimeRange: range,
-                                  //     list: income,
-                                  //     range: monthPicker);
+                              child: filteredList.isEmpty
+                                  ? Padding(
+                                      padding: EdgeInsets.only(top: 60.h),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            SvgPicture.asset(
+                                                "lib/global/images/Group.svg",
+                                                width: 80.w),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 13.h),
+                                              child: const Text(
+                                                "Add transaction to see the list",
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ],
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      controller: ScrollController(),
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        final incomeList = filteredList[index];
+                                        final listCategory =
+                                            Hive.box<Categories>(db_Name)
+                                                .values
+                                                .toList();
+                                        final categoryKey = getKeyCategory(
+                                            listCategory,
+                                            incomeList.category!.category!);
 
-                                  filteredList.isEmpty
-                                      ? Padding(
-                                          padding: EdgeInsets.only(top: 60.h),
-                                          child: Center(
+                                        String formattedDate =
+                                            DateFormat('dd-MM-yyyy')
+                                                .format(incomeList.date!);
+                                        return GestureDetector(
+                                          onLongPress: () => alertDialog(
+                                              incomeList.key, context),
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/editscreen',
+                                                arguments: {
+                                                  "date": incomeList.date,
+                                                  "category":
+                                                      incomeList.category,
+                                                  "amount": incomeList.amount,
+                                                  "notes": incomeList.notes,
+                                                  "key": incomeList.key,
+                                                  "type": incomeList.type,
+                                                  "categoryKey": categoryKey
+                                                });
+                                          },
+                                          child: Card(
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 10.w),
+                                            shadowColor: Colors.grey[350],
                                             child: Column(
                                               children: [
-                                                SvgPicture.asset(
-                                                    "lib/global/images/Group.svg",
-                                                    width: 80.w),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: 13.h),
-                                                  child: const Text(
-                                                    "Add transaction to see the list",
-                                                    textAlign: TextAlign.center,
+                                                ListTile(
+                                                  leading: Container(
+                                                    alignment: Alignment.center,
+                                                    height: mediaQuery(
+                                                        context, 0.05),
+                                                    width: mediaQueryWidth(
+                                                        context, 0.12),
+                                                    decoration:
+                                                        roundedConrnerTwo(
+                                                            themeColor),
+                                                    child: Text(
+                                                      incomeList.type ==
+                                                              CategoryType
+                                                                  .income
+                                                          ? "INC"
+                                                          : "EXP",
+                                                      style: boldText(17),
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                            ),
-                                          ),
-                                        )
-                                      : ListView.separated(
-                                          controller: ScrollController(),
-                                          shrinkWrap: true,
-                                          itemBuilder: (context, index) {
-                                            final incomeList =
-                                                filteredList[index];
-                                            final listCategory =
-                                                Hive.box<Categories>(db_Name)
-                                                    .values
-                                                    .toList();
-                                            final categoryKey = getKeyCategory(
-                                                listCategory,
-                                                incomeList.category!.category!);
-
-                                            String formattedDate =
-                                                DateFormat('dd-MM-yyyy')
-                                                    .format(incomeList.date!);
-                                            return GestureDetector(
-                                              onLongPress: () => alertDialog(
-                                                  incomeList.key, context),
-                                              onTap: () {
-                                                Navigator.pushNamed(
-                                                    context, '/editscreen',
-                                                    arguments: {
-                                                      "date": incomeList.date,
-                                                      "category":
-                                                          incomeList.category,
-                                                      "amount":
-                                                          incomeList.amount,
-                                                      "notes": incomeList.notes,
-                                                      "key": incomeList.key,
-                                                      "type": incomeList.type,
-                                                      "categoryKey": categoryKey
-                                                    });
-                                              },
-                                              child: Card(
-                                                margin: EdgeInsets.symmetric(
-                                                    horizontal: 10.w),
-                                                shadowColor: Colors.grey[350],
-                                                child: Column(
-                                                  children: [
-                                                    ListTile(
-                                                      leading: Container(
-                                                        alignment:
-                                                            Alignment.center,
-                                                        height: mediaQuery(
-                                                            context, 0.05),
-                                                        width: mediaQueryWidth(
-                                                            context, 0.12),
-                                                        decoration:
-                                                            roundedConrnerTwo(
-                                                                themeColor),
-                                                        child: Text(
-                                                          incomeList.type ==
-                                                                  CategoryType
-                                                                      .income
-                                                              ? "INC"
-                                                              : "EXP",
-                                                          style: boldText(17),
-                                                        ),
+                                                  title: Text(incomeList
+                                                      .category!.category!),
+                                                  subtitle: Text(formattedDate),
+                                                  trailing: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Text(
+                                                        "₹${incomeList.amount}",
+                                                        style: boldText(21),
                                                       ),
-                                                      title: Text(incomeList
-                                                          .category!.category!),
-                                                      subtitle:
-                                                          Text(formattedDate),
-                                                      trailing: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          Text(
-                                                            "₹${incomeList.amount}",
-                                                            style: boldText(21),
-                                                          ),
-                                                          SizedBox(
-                                                            width:
-                                                                mediaQueryWidth(
-                                                                    context,
-                                                                    0.02),
-                                                          ),
-                                                          Icon(
+                                                      SizedBox(
+                                                        width: mediaQueryWidth(
+                                                            context, 0.02),
+                                                      ),
+                                                      Icon(
+                                                        incomeList.type ==
+                                                                CategoryType
+                                                                    .income
+                                                            ? Icons
+                                                                .arrow_circle_up_outlined
+                                                            : Icons
+                                                                .arrow_circle_down,
+                                                        size: 20.sp,
+                                                        color:
                                                             incomeList.type ==
-                                                                    CategoryType
-                                                                        .income
-                                                                ? Icons
-                                                                    .arrow_circle_up_outlined
-                                                                : Icons
-                                                                    .arrow_circle_down,
-                                                            size: 20.sp,
-                                                            color: incomeList
-                                                                        .type ==
                                                                     CategoryType
                                                                         .income
                                                                 ? Colors.green
                                                                 : Colors.red,
-                                                          ),
-                                                        ],
                                                       ),
-                                                    ),
-                                                    const Divider(),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 10.h),
-                                                      child: detailsView(
-                                                          16,
-                                                          'Notes :',
-                                                          incomeList.notes!),
-                                                    ),
-                                                    SizedBox(
-                                                      height: mediaQuery(
-                                                          context, 0.02),
-                                                    )
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                          separatorBuilder: (context, index) =>
-                                              Container(
-                                                height:
-                                                    mediaQuery(context, 0.01),
-                                                width: double.infinity,
-                                                color: const Color.fromARGB(
-                                                    255, 255, 238, 238),
-                                              ),
-                                          itemCount: filteredList.length))
+                                                const Divider(),
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      top: 10.h),
+                                                  child: detailsView(
+                                                      16,
+                                                      'Notes :',
+                                                      incomeList.notes!),
+                                                ),
+                                                SizedBox(
+                                                  height:
+                                                      mediaQuery(context, 0.02),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          Container(
+                                            height: mediaQuery(context, 0.01),
+                                            width: double.infinity,
+                                            color: const Color.fromARGB(
+                                                255, 255, 238, 238),
+                                          ),
+                                      itemCount: filteredList.length))
                         ],
                       ),
                     ),
@@ -462,9 +424,9 @@ class _StatisticState extends State<StatisticIncome>
     );
   }
 
-  changeTap() {
-    ontap.value = _dateController.index;
-  }
+  // changeTap() {
+  //   ontap.value = _dateController.index;
+  // }
 
   alertDialog(int key, BuildContext context) {
     showDialog<String>(
@@ -489,10 +451,3 @@ class _StatisticState extends State<StatisticIncome>
     );
   }
 }
-
-// class Datas {
-//   String? category;
-//   int? amount;
-
-//   Datas({this.amount, this.category});
-// }

@@ -38,24 +38,9 @@ class _StatisticState extends State<Statistic>
   void initState() {
     // chartsof = chartView();
     _dateController = TabController(length: 4, vsync: this, initialIndex: 1);
-    _dateController.addListener(Setting);
 
     super.initState();
   }
-
-  // ignore: non_constant_identifier_names
-  Setting() {
-    setState(() {});
-  }
-
-  // ValueNotifier<int> ontap = ValueNotifier(0);
-  String day = "01";
-  String month = 'month';
-  String year = "year";
-
-  DateTime monthPicker = DateTime.now();
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +56,15 @@ class _StatisticState extends State<Statistic>
                 context.watch<TabcontrollerCubit>().state;
                 final buildList = context.watch<TransactionBloc>().state;
                 final dateList = context.watch<DatetimeCubit>().state;
+                context.read<TransactionBloc>().add(GetFilteredList(
+                    tabIndex: _dateController.index,
+                    dateTime: dateList.dateTime!,
+                    dateTimeRange: dateList.dateTimeRange!));
 
-                buildList as TransactionInitial;
-                final List<AddTransaction> expense =
-                    splitTransaction(buildList.list, CategoryType.expense);
-                final List<AddTransaction> filteredList = gotoFilter(
-                    range: dateList.dateTime!,
-                    controller: _dateController,
-                    list: expense,
-                    dateTimeRange: dateList.dateTimeRange!);
+                final filteredList = buildList.expense;
+
                 List<Data> connectedList = chartViewList(filteredList);
-                final double totalExp =
-                    totalTransaction(filteredList, CategoryType.expense);
+          
                 return Column(
                   children: [
                     Container(
@@ -103,7 +85,7 @@ class _StatisticState extends State<Statistic>
                                 height: mediaQuery(context, 0.02),
                               ),
                               Text(
-                                "₹ $totalExp",
+                                "₹ ${buildList.expenseAmount}",
                                 style: boldText(60.sp),
                               )
                             ],

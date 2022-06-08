@@ -93,7 +93,7 @@ class _SettingsState extends State<Settings> {
               ? BlocBuilder<NotificatonCubit, NotificatonState>(
                   builder: (context, state) {
                     return SwitchListTile(
-                      value: state is ChangeListTail ? state.value : true,
+                      value: state.value,
                       activeTrackColor: themeColor,
                       activeColor: lightColor,
                       onChanged: (value) async {
@@ -101,12 +101,8 @@ class _SettingsState extends State<Settings> {
                         saveSwitchState(value);
                         gotoSettings(0,
                             value: value,
-                            expense: state is NotificationInitial
-                                ? state.totalExp
-                                : 0,
-                            income: state is NotificationInitial
-                                ? state.totalInc
-                                : 0);
+                            expense: state.totalExp,
+                            income: state.totalInc);
                       },
                       title: Row(
                         children: [

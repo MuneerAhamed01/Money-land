@@ -10,7 +10,8 @@ class AddCategory extends CategoryEvent {
 
 class DeleteCategory extends CategoryEvent {
   final int key;
-  DeleteCategory({required this.key});
+  final String name;
+  DeleteCategory({required this.key,required this.name});
 }
 
 class EditCategory extends CategoryEvent {

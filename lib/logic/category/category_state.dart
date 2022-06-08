@@ -5,5 +5,10 @@ abstract class CategoryState {}
 
 class CategoryInitial extends CategoryState {
   final List<Categories> categoriesList;
-  CategoryInitial({required this.categoriesList});
+  final List<Categories> expense;
+  final List<Categories> income;
+  CategoryInitial(
+      {required this.categoriesList,
+      required this.expense,
+      required this.income});
 }

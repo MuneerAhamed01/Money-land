@@ -9,13 +9,13 @@ part 'notificaton_state.dart';
 
 class NotificatonCubit extends Cubit<NotificatonState> {
   static final boxList = Hive.box<AddTransaction>(db_transaction);
-//  static SharedPreferences prefs = await SharedPreferences.getInstance();
 
   NotificatonCubit()
       : super(NotificationInitial(
             totalExp: 0,
             totalInc: 0,
-            transactionList: boxList.values.toList()));
+            transactionList: boxList.values.toList(),
+            value: true));
 
   void getNotification() {
     final list = boxList.values.toList();
@@ -30,28 +30,33 @@ class NotificatonCubit extends Cubit<NotificatonState> {
     }
 
     emit(NotificationInitial(
-      totalExp: amountExp!,
-      totalInc: amountInc!,
+        totalExp: amountExp!,
+        totalInc: amountInc!,
+        transactionList: list,
+        value: state.value));
+  }
+
+  changeOf(bool value) async {
+    final List<AddTransaction> list = boxList.values.toList();
+    double amountExp = 0;
+    double amountInc = 0;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("switchState", value);
+
+    for (int i = 0; i < list.length - 1; i++) {
+      if (list[i].type == CategoryType.expense) {
+        amountExp = list[i].amount! + amountExp;
+      } else {
+      
+        amountInc = list[i].amount! + amountInc;
+      }
+    }
+
+    emit(NotificationInitial(
+      value: value,
+      totalExp: amountExp,
+      totalInc: amountInc,
       transactionList: list,
     ));
-  }
-
-  getSwitchValues() async {
-    // isSwitchedFT = await getSwitchState();
-  }
-
-  
-
-  Future<bool> getSwitchState() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isSwitchedFT = prefs.getBool("switchState") ?? false;
-
-    return isSwitchedFT;
-  }
-
-  changeOf(bool value) async{
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool("switchState", value);
-    emit(ChangeListTail(value: value));
   }
 }

@@ -9,18 +9,14 @@ import 'package:money_land/database/database_crud/db_crud_categories.dart';
 import 'package:money_land/database/moneyland_model_class.dart';
 import 'package:money_land/global/styles.dart';
 import 'package:money_land/logic/datetime/datetime_cubit.dart';
-import 'package:money_land/logic/notifcation/notificaton_cubit.dart';
 import 'package:money_land/logic/tabcontroller/tabcontroller_cubit.dart';
 import 'package:money_land/logic/transaction/transaction_bloc.dart';
-import 'package:money_land/main.dart';
 import 'package:money_land/screens/add_page/assest/widgets.dart';
 import 'package:money_land/screens/homepage/assest/functions.dart';
 import 'package:money_land/screens/homepage/assest/styles.dart';
 import 'package:money_land/screens/homepage/assest/widgets.dart';
 import 'package:money_land/themes/colors/colors.dart';
 import 'package:money_land/themes/mediaquery/mediaquery.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../global/functions/functions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomePage extends StatefulWidget {
@@ -31,8 +27,6 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-
-
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late TabController _datecontrollr;
 
@@ -41,13 +35,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _datecontrollr = TabController(length: 4, vsync: this, initialIndex: 1);
 
     super.initState();
-   
   }
 
-  
   @override
   Widget build(BuildContext context) {
- 
     return Scaffold(
       backgroundColor: homeScaffoldBackground,
       appBar: AppBar(
@@ -74,20 +65,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       body: SingleChildScrollView(
         child: Builder(
           builder: (context) {
-            // final notification = context.watch<NotificatonCubit>().state;
             context.read<DatetimeCubit>().onDate(_datecontrollr);
             context.watch<TabcontrollerCubit>().state;
             final buildList = context.watch<TransactionBloc>().state;
             final dateList = context.watch<DatetimeCubit>().state;
+            context.read<TransactionBloc>().add(GetFilteredList(
+                tabIndex: _datecontrollr.index,
+                dateTime: dateList.dateTime!,
+                dateTimeRange: dateList.dateTimeRange!));
 
-            buildList as TransactionInitial;
-            final filteredList = gotoFilter(
-                range: dateList.dateTime!,
-                controller: _datecontrollr,
-                list: buildList.list,
-                dateTimeRange: dateList.dateTimeRange!);
-            totalIncome = totalTransaction(filteredList, CategoryType.income);
-            totalExp = totalTransaction(filteredList, CategoryType.expense);
+            final filteredList = buildList.list;
+            // print(filteredList[1].category!.category);
+            // print(filteredList[1].visible);
+
+            final totalIncome =
+                totalTransaction(filteredList, CategoryType.income);
+            final totalExp =
+                totalTransaction(filteredList, CategoryType.expense);
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,8 +168,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             height: mediaQuery(context, 0.24),
                             width: double.infinity,
                             child: Text(
-                              totalIncome! > totalExp!
-                                  ? '₹${totalIncome! - totalExp!}'
+                              totalIncome > totalExp
+                                  ? '₹${totalIncome - totalExp}'
                                   : "₹ 0.00",
                               style: TextStyle(
                                   fontSize: 55.sp, fontWeight: FontWeight.bold),
@@ -398,23 +392,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
     );
-  }
-
-  Future<DateTime> datePicker() async {
-    DateTime? date;
-
-    date = await showDatePicker(
-        initialEntryMode: DatePickerEntryMode.calendarOnly,
-        initialDatePickerMode: DatePickerMode.day,
-        context: context,
-        initialDate: now,
-        firstDate: DateTime(now.year - 5),
-        lastDate: DateTime(now.year + 5));
-    if (date != null) {
-      return date;
-    } else {
-      return now;
-    }
   }
 
   Widget datePickerOfHome(int type, BuildContext context, String? dateStart) {
